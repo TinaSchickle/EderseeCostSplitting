@@ -1,0 +1,13 @@
+{
+  "name": "Edersee Kasse",
+  "short_name": "Edersee Kasse",
+  "description": "Kostenaufteilung für den Edersee-Trip",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#bff0e4",
+  "theme_color": "#8fe3d6",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

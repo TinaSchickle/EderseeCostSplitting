@@ -4,6 +4,13 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Edersee Kosten 🌞</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icon.svg" />
+  <meta name="theme-color" content="#8fe3d6" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Edersee Kasse" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <style>
     :root{
       --sky1:#8fe3d6;      /* türkis wie der See */
@@ -19,6 +26,7 @@
       --teal:#12b3a0;
       --teal-d:#0d9587;
       --rose:#ff6b8a;
+      --red:#e05555;
       --shadow:0 10px 30px rgba(20,80,80,.12);
     }
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -34,7 +42,7 @@
       min-height:100dvh;
       -webkit-font-smoothing:antialiased;
     }
-    .wrap{max-width:900px;margin:0 auto;padding:22px 16px 80px}
+    .wrap{max-width:1200px;margin:0 auto;padding:22px 16px 80px}
 
     header.hero{
       text-align:center;
@@ -54,6 +62,16 @@
     }
     .dot{width:8px;height:8px;border-radius:50%}
     .dot.on{background:#22c55e}.dot.off{background:#f59e0b}
+    .statusbar{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:6px}
+    .syncbtn{
+      appearance:none;cursor:pointer;font:inherit;font-size:12px;font-weight:700;color:var(--teal-d);
+      background:rgba(255,255,255,.7);border:1px solid var(--line);border-radius:999px;padding:4px 12px;
+      display:inline-flex;align-items:center;gap:5px;transition:transform .08s, background .15s;
+    }
+    .syncbtn:hover{background:#fff}
+    .syncbtn:active{transform:scale(.95)}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .syncbtn.busy #syncIcon{display:inline-block;animation:spin .7s linear infinite}
 
     .card{
       background:var(--card);
@@ -100,30 +118,13 @@
     .owe .arrow{color:var(--muted);font-size:13px}
     .settle-empty{color:var(--muted);text-align:center;padding:10px}
 
-    /* Add form */
-    .add{
-      display:grid;
-      grid-template-columns:1fr;
-      gap:10px;
-    }
-    .field label{font-size:12px;color:var(--muted);font-weight:600;display:block;margin-bottom:4px}
-    .row2{display:flex;gap:10px;flex-wrap:wrap}
-    .row2 .field{flex:1 1 140px}
     input,select{
-      width:100%;font:inherit;color:var(--ink);
-      background:#fffdf8;border:1.5px solid var(--line);border-radius:12px;
-      padding:10px 12px;outline:none;transition:border-color .15s, box-shadow .15s;
+      font:inherit;color:var(--ink);
+      background:#fffdf8;border:1.5px solid var(--line);border-radius:10px;
+      padding:8px 9px;outline:none;transition:border-color .15s, box-shadow .15s;
     }
     input:focus,select:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(18,179,160,.15)}
-    .datestep{display:flex;align-items:center;gap:8px}
-    .datestep input{text-align:center}
-    .stepbtn{
-      flex:0 0 auto;width:42px;height:42px;border-radius:12px;border:1.5px solid var(--line);
-      background:#fffdf8;font-size:18px;cursor:pointer;color:var(--teal-d);font-weight:800;
-      display:grid;place-items:center;transition:transform .08s, background .15s;
-    }
-    .stepbtn:active{transform:scale(.92)}
-    .stepbtn:hover{background:#f3fbf9}
+    input:disabled{background:#f4f1e8;color:var(--muted);cursor:not-allowed}
     .btn{
       appearance:none;border:none;cursor:pointer;font:inherit;font-weight:800;
       color:#fff;background:linear-gradient(160deg,var(--coral),var(--coral-d));
@@ -135,26 +136,50 @@
     .btn.full{width:100%}
 
     /* Table */
-    .tablewrap{overflow-x:auto;margin:0 -4px}
-    table{width:100%;border-collapse:collapse;font-size:14px;min-width:560px}
-    th,td{padding:10px 8px;text-align:left;border-bottom:1px solid var(--line);vertical-align:middle}
-    th{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:700}
-    td.num,th.num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+    .tablewrap{overflow-x:auto;margin:0 -4px;padding-bottom:4px}
+    table{width:100%;border-collapse:collapse;font-size:13px;min-width:1360px}
+    th,td{padding:6px 5px;text-align:left;border-bottom:1px solid var(--line);vertical-align:middle}
+    th{font-size:10.5px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);font-weight:700;white-space:nowrap}
+    td.num,th.num{text-align:right}
     tr:last-child td{border-bottom:none}
-    .pill{
-      display:inline-block;font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;
-    }
-    .pill.equal{background:#e6f7f4;color:var(--teal-d)}
-    .pill.acc{background:#fff0e6;color:var(--coral-d)}
-    .payer{display:inline-flex;align-items:center;gap:6px}
-    .payer .ava{width:24px;height:24px;font-size:11px}
+    tr.row-invalid{background:rgba(224,85,85,.09)}
+    tr.row-invalid td{border-bottom-color:rgba(224,85,85,.25)}
     .del{
       background:none;border:none;cursor:pointer;color:#c98b8b;font-size:16px;padding:4px 6px;border-radius:8px;
     }
-    .del:hover{background:#fdeaea;color:#e05555}
+    .del:hover{background:#fdeaea;color:var(--red)}
     .empty{color:var(--muted);text-align:center;padding:18px}
     footer{text-align:center;color:#5a6a69;font-size:12px;margin-top:24px}
     .note{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.5}
+
+    .datecell{white-space:nowrap}
+    .datestep{display:flex;align-items:center;gap:3px}
+    .datestep input{width:112px;text-align:center;padding:7px 4px}
+    .stepbtn{
+      flex:0 0 auto;width:26px;height:30px;border-radius:8px;border:1.5px solid var(--line);
+      background:#fffdf8;font-size:14px;cursor:pointer;color:var(--teal-d);font-weight:800;
+      display:grid;place-items:center;transition:transform .08s, background .15s;
+    }
+    .stepbtn:active{transform:scale(.9)}
+    .stepbtn:hover{background:#f3fbf9}
+
+    .descInput{width:150px}
+    .amountInput{width:74px;text-align:right}
+    .payerSelect{width:104px}
+    .splitSelect{width:112px}
+    .shareInput{width:62px;text-align:right;padding:7px 5px}
+    th.person-col{text-align:right}
+
+    .addRowWrap{display:flex;justify-content:center;margin-top:14px}
+    .addRowBtn{
+      appearance:none;cursor:pointer;font:inherit;font-weight:800;font-size:14px;color:var(--teal-d);
+      background:#fff;border:1.5px dashed var(--teal);border-radius:14px;padding:10px 22px;
+      display:inline-flex;align-items:center;gap:8px;transition:background .15s, transform .08s;
+    }
+    .addRowBtn:hover{background:#f3fbf9}
+    .addRowBtn:active{transform:scale(.97)}
+
+    .invalidBadge{color:var(--red);font-size:14px}
   </style>
 </head>
 <body>
@@ -163,7 +188,10 @@
       <div style="font-size:40px;line-height:1">🌞🏖️</div>
       <h1>Edersee&nbsp;Kasse</h1>
       <p>Wer schuldet wem was — ganz entspannt aufgeteilt.</p>
-      <div class="status"><span id="statusDot" class="dot off"></span><span id="statusText">lokal gespeichert</span></div>
+      <div class="statusbar">
+        <div class="status"><span id="statusDot" class="dot off"></span><span id="statusText">lokal gespeichert</span></div>
+        <button class="syncbtn" id="syncBtn" title="Jetzt aktualisieren"><span id="syncIcon">🔄</span> Aktualisieren</button>
+      </div>
     </header>
 
     <!-- Übersicht -->
@@ -172,71 +200,31 @@
       <div class="totals" id="totals"></div>
     </section>
 
-    <!-- Abrechnung -->
-    <section class="card">
-      <h2><span class="emoji">🤝</span> Abrechnung</h2>
-      <div class="settle" id="settle"></div>
-    </section>
-
-    <!-- Neue Ausgabe -->
-    <section class="card">
-      <h2><span class="emoji">➕</span> Neue Ausgabe</h2>
-      <div class="add">
-        <div class="field">
-          <label>Datum</label>
-          <div class="datestep">
-            <button class="stepbtn" id="dayPrev" title="Ein Tag zurück">‹</button>
-            <input type="date" id="fDate" />
-            <button class="stepbtn" id="dayNext" title="Ein Tag vor">›</button>
-          </div>
-        </div>
-        <div class="field">
-          <label>Beschreibung</label>
-          <input type="text" id="fDesc" placeholder="z. B. Einkauf, Grillkohle, Sprit …" />
-        </div>
-        <div class="row2">
-          <div class="field">
-            <label>Betrag (€)</label>
-            <input type="text" inputmode="decimal" id="fAmount" placeholder="0,00" />
-          </div>
-          <div class="field">
-            <label>Bezahlt von</label>
-            <select id="fPayer"></select>
-          </div>
-          <div class="field">
-            <label>Aufteilung</label>
-            <select id="fSplit">
-              <option value="equal">Gleich (alle)</option>
-              <option value="accommodation">Unterkunft (Paare 50 %)</option>
-            </select>
-          </div>
-        </div>
-        <button class="btn full" id="addBtn">Hinzufügen 🌴</button>
-        <div class="note">
-          <b>Unterkunft-Aufteilung:</b> Paare teilen sich ein Zimmer — Person&nbsp;1 zahlt voll, Person&nbsp;2 nur 50&nbsp;%.
-          Halber Anteil: <b>Lisa</b> (mit Denis) und <b>Natalia&nbsp;+1</b> (mit Natalia).
-        </div>
-      </div>
-    </section>
-
     <!-- Tabelle -->
     <section class="card">
       <h2><span class="emoji">📋</span> Alle Ausgaben</h2>
       <div class="tablewrap">
         <table>
           <thead>
-            <tr>
-              <th>Datum</th>
-              <th>Beschreibung</th>
-              <th class="num">Betrag</th>
-              <th>Bezahlt von</th>
-              <th>Aufteilung</th>
-              <th></th>
-            </tr>
+            <tr id="theadRow"></tr>
           </thead>
           <tbody id="tbody"></tbody>
         </table>
       </div>
+      <div class="addRowWrap">
+        <button class="addRowBtn" id="addRowBtn">➕ Neue Ausgabe</button>
+      </div>
+      <div class="note">
+        <b>Aufteilungstyp „Alle gleich":</b> Betrag wird automatisch auf alle 10 Personen verteilt.
+        <b>„Individuell":</b> Betrag selbst pro Person eintragen — die Summe muss dem Betrag entsprechen,
+        sonst bleibt die Zeile rot markiert.
+      </div>
+    </section>
+
+    <!-- Abrechnung -->
+    <section class="card">
+      <h2><span class="emoji">🤝</span> Wer schuldet Tina was?</h2>
+      <div class="settle" id="settle"></div>
     </section>
 
     <footer>Edersee 2026 · gemacht mit 🌞 &amp; 💚</footer>
@@ -250,11 +238,11 @@
      Browser (localStorage). Sobald URL + Key gesetzt sind, nutzt
      sie automatisch Supabase, sodass alle dieselben Daten sehen.
      ============================================================ */
-  const SUPABASE_URL = "DEINE_SUPABASE_URL";
-  const SUPABASE_ANON_KEY = "DEIN_SUPABASE_ANON_KEY";
+  const SUPABASE_URL = "https://wscuovmzdbhwugxsgfjw.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_eAz7id9uPfkRq0wTll_UFA_HaR9JMj1";
 
   const PEOPLE = ["Jacob","Andy","Ralf","Denis","Lisa","Natalia","Natalia +1","Thorsten","Tina","Abel"];
-  // Wer im Zimmer-Paar nur den halben Unterkunfts-Anteil zahlt:
+  // Wer im Zimmer-Paar nur den halben Unterkunfts-Anteil zahlt (nur für die Vorbefüllung der Unterkunft):
   const HALF_SHARE = new Set(["Lisa","Natalia +1"]);
   const DEFAULT_PAYER = "Tina";
 
@@ -262,25 +250,60 @@
   const PALETTE = ["#ff8a5c","#12b3a0","#ff6b8a","#f6a83b","#5aa9e6","#9b6bd6","#3fc37a","#e0567f","#0d9587","#f5713f"];
   const colorOf = (name)=>PALETTE[PEOPLE.indexOf(name) % PALETTE.length] || "#12b3a0";
   const initials = (name)=>name.replace("+1","").trim().slice(0,2).toUpperCase();
+  const shortName = (p)=>p==="Natalia +1" ? "Nat.+1" : p;
 
   /* ---------- Helpers ---------- */
   const euro = (n)=>Number(n||0).toLocaleString("de-DE",{style:"currency",currency:"EUR"});
   const round2 = (n)=>Math.round((n+Number.EPSILON)*100)/100;
   const todayISO = ()=>{ const d=new Date(); d.setMinutes(d.getMinutes()-d.getTimezoneOffset()); return d.toISOString().slice(0,10); };
-  const fmtDate = (iso)=>{ try{ const [y,m,d]=iso.split("-"); return `${d}.${m}.${y.slice(2)}`; }catch(e){ return iso; } };
-  const parseAmount = (s)=>{ const v=parseFloat(String(s).replace(/\./g,"").replace(",",".")); return isNaN(v)?NaN:v; };
+  const parseAmount = (s)=>{ const v=parseFloat(String(s).replace(/\./g,"").replace(",",".")); return isNaN(v)?0:v; };
+  const amountDisplay = (n)=>(Number(n)||0).toLocaleString("de-DE",{minimumFractionDigits:2,maximumFractionDigits:2});
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  /* ---------- Gleichmäßige Aufteilung (Rundungsdifferenz landet bei den ersten Personen) ---------- */
+  function equalSplit(amount){
+    const cents = Math.round((Number(amount)||0)*100);
+    const n = PEOPLE.length;
+    const base = Math.floor(cents/n);
+    const remainder = cents - base*n;
+    const shares = {};
+    PEOPLE.forEach((p,i)=>{ shares[p] = round2((base + (i<remainder?1:0))/100); });
+    return shares;
+  }
+  function sumShares(e){ return Object.values(e.shares||{}).reduce((s,v)=>s+(Number(v)||0),0); }
+  function isRowValid(e){ return Math.abs(round2(sumShares(e)) - round2(e.amount||0)) < 0.011; }
 
   /* ---------- Storage: Supabase oder localStorage ---------- */
   const usingSupabase = SUPABASE_URL.startsWith("http") && SUPABASE_ANON_KEY.length > 20;
   let sb = null;
   if(usingSupabase && window.supabase){ sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); }
 
-  const LS_KEY = "edersee_expenses_v1";
+  const LS_KEY = "edersee_expenses_v2";
+  let tableMissing = false;
+
+  function showStorageWarning(error){
+    console.error(error);
+    const msg = (error && error.message) || "";
+    if(error && error.code==="PGRST204" && /shares/.test(msg)){
+      tableMissing = true;
+      $("statusDot").className="dot off";
+      $("statusText").textContent="⚠️ Spalte 'shares' fehlt – Migration ausführen (siehe README)";
+    } else if((error && error.code==="PGRST205") || /schema cache|does not exist/i.test(msg)){
+      tableMissing = true;
+      $("statusDot").className="dot off";
+      $("statusText").textContent="⚠️ Tabelle 'expenses' fehlt – SQL ausführen (siehe README)";
+    } else {
+      $("statusDot").className="dot off";
+      $("statusText").textContent="⚠️ Speichern fehlgeschlagen: "+msg;
+    }
+  }
+
   const store = {
     async list(){
       if(sb){
         const {data,error} = await sb.from("expenses").select("*").order("date",{ascending:true}).order("created_at",{ascending:true});
-        if(error){ console.error(error); return []; }
+        if(error){ showStorageWarning(error); return []; }
+        tableMissing = false;
         return data;
       }
       return JSON.parse(localStorage.getItem(LS_KEY) || "[]");
@@ -288,17 +311,27 @@
     async add(e){
       if(sb){
         const {data,error} = await sb.from("expenses").insert(e).select();
-        if(error){ alert("Speichern fehlgeschlagen: "+error.message); return null; }
+        if(error){ showStorageWarning(error); return null; }
         return data[0];
       }
       const arr = JSON.parse(localStorage.getItem(LS_KEY) || "[]");
       const row = {id: crypto.randomUUID(), created_at:new Date().toISOString(), ...e};
       arr.push(row); localStorage.setItem(LS_KEY, JSON.stringify(arr)); return row;
     },
+    async update(id, patch){
+      if(sb){
+        const {error} = await sb.from("expenses").update(patch).eq("id", id);
+        if(error){ showStorageWarning(error); }
+        return;
+      }
+      const arr = JSON.parse(localStorage.getItem(LS_KEY) || "[]");
+      const idx = arr.findIndex(r=>r.id===id);
+      if(idx>=0){ arr[idx] = {...arr[idx], ...patch}; localStorage.setItem(LS_KEY, JSON.stringify(arr)); }
+    },
     async remove(id){
       if(sb){
         const {error} = await sb.from("expenses").delete().eq("id", id);
-        if(error){ alert("Löschen fehlgeschlagen: "+error.message); }
+        if(error){ showStorageWarning(error); }
         return;
       }
       const arr = JSON.parse(localStorage.getItem(LS_KEY) || "[]").filter(r=>r.id!==id);
@@ -306,127 +339,179 @@
     }
   };
 
-  /* ---------- Aufteilungs-Logik ---------- */
-  function weightsFor(splitType){
-    const w = {};
-    for(const p of PEOPLE){
-      if(splitType==="accommodation") w[p] = HALF_SHARE.has(p) ? 0.5 : 1;
-      else w[p] = 1;
-    }
-    return w;
-  }
-
+  /* ---------- Salden & Abrechnung relativ zu Tina ---------- */
   function computeBalances(expenses){
     const bal = {}; PEOPLE.forEach(p=>bal[p]=0);
     for(const e of expenses){
       const amt = Number(e.amount)||0;
-      const w = weightsFor(e.split_type);
-      const totalW = PEOPLE.reduce((s,p)=>s+w[p],0);
       if(bal[e.paid_by]!==undefined) bal[e.paid_by] += amt;
-      for(const p of PEOPLE) bal[p] -= amt * w[p]/totalW;
+      for(const p of PEOPLE){ bal[p] -= Number((e.shares||{})[p])||0; }
     }
     return bal;
-  }
-
-  // Minimale Anzahl Zahlungen: Schuldner -> Gläubiger
-  function settle(bal){
-    const creditors=[], debtors=[];
-    for(const p of PEOPLE){
-      const v = round2(bal[p]);
-      if(v > 0.005) creditors.push({p, v});
-      else if(v < -0.005) debtors.push({p, v:-v});
-    }
-    creditors.sort((a,b)=>b.v-a.v); debtors.sort((a,b)=>b.v-a.v);
-    const res=[]; let i=0, j=0;
-    while(i<debtors.length && j<creditors.length){
-      const amt = Math.min(debtors[i].v, creditors[j].v);
-      res.push({from:debtors[i].p, to:creditors[j].p, amount:round2(amt)});
-      debtors[i].v -= amt; creditors[j].v -= amt;
-      if(debtors[i].v < 0.005) i++;
-      if(creditors[j].v < 0.005) j++;
-    }
-    return res;
   }
 
   /* ---------- Rendering ---------- */
   const $ = (id)=>document.getElementById(id);
   let EXPENSES = [];
 
-  function ava(name, cls=""){
-    return `<span class="ava ${cls}" style="background:${colorOf(name)}">${initials(name)}</span>`;
+  function ava(name){
+    return `<span class="ava" style="background:${colorOf(name)}">${initials(name)}</span>`;
   }
 
   function renderTotals(){
     const total = EXPENSES.reduce((s,e)=>s+(Number(e.amount)||0),0);
-    const bal = computeBalances(EXPENSES);
-    const tinaPaid = EXPENSES.filter(e=>e.paid_by===DEFAULT_PAYER).reduce((s,e)=>s+(Number(e.amount)||0),0);
     const perPerson = total / PEOPLE.length;
     $("totals").innerHTML = `
       <div class="stat"><div class="k">Gesamt</div><div class="v coral">${euro(total)}</div></div>
       <div class="stat"><div class="k">Ausgaben</div><div class="v">${EXPENSES.length}</div></div>
       <div class="stat"><div class="k">Ø pro Person</div><div class="v teal">${euro(perPerson)}</div></div>
-      <div class="stat"><div class="k">${DEFAULT_PAYER} ausgelegt</div><div class="v">${euro(tinaPaid)}</div></div>
     `;
   }
 
   function renderSettle(){
     const bal = computeBalances(EXPENSES);
-    const res = settle(bal);
+    const rows = PEOPLE.filter(p=>p!==DEFAULT_PAYER).map(p=>({p, amt: round2(-bal[p])}));
+    const withDebt = rows.filter(r=>Math.abs(r.amt) > 0.005);
     const el = $("settle");
-    if(res.length===0){
-      el.innerHTML = `<div class="settle-empty">Noch nichts zu begleichen 🌊</div>`;
+    if(withDebt.length===0){
+      el.innerHTML = `<div class="settle-empty">Alle sind mit Tina ausgeglichen 🌊</div>`;
       return;
     }
-    el.innerHTML = res.map(r=>`
-      <div class="owe">
-        ${ava(r.from)}
-        <div class="txt"><b>${r.from}</b> <span class="arrow">schuldet</span> <b>${r.to}</b></div>
-        <div class="amt">${euro(r.amount)}</div>
-      </div>
-    `).join("");
+    el.innerHTML = withDebt.map(r=>{
+      if(r.amt > 0){
+        return `<div class="owe">${ava(r.p)}<div class="txt"><b>${escapeHtml(r.p)}</b> <span class="arrow">schuldet</span> <b>${DEFAULT_PAYER}</b></div><div class="amt">${euro(r.amt)}</div></div>`;
+      }
+      return `<div class="owe">${ava(DEFAULT_PAYER)}<div class="txt"><b>${DEFAULT_PAYER}</b> <span class="arrow">schuldet</span> <b>${escapeHtml(r.p)}</b></div><div class="amt">${euro(-r.amt)}</div></div>`;
+    }).join("");
+  }
+
+  function renderHead(){
+    $("theadRow").innerHTML = `
+      <th>Datum</th>
+      <th>Beschreibung</th>
+      <th class="num">Betrag</th>
+      <th>Gezahlt von</th>
+      <th>Aufteilungstyp</th>
+      ${PEOPLE.map(p=>`<th class="num person-col" title="${escapeHtml(p)}">${escapeHtml(shortName(p))}</th>`).join("")}
+      <th></th>
+    `;
+  }
+
+  function rowHtml(e){
+    const isEqual = e.split_type !== "individual";
+    const invalid = !isRowValid(e);
+    const shares = e.shares || {};
+    return `
+    <tr class="${invalid?'row-invalid':''}" ${invalid?`title="Summe der Aufteilung: ${euro(sumShares(e))} — Betrag: ${euro(e.amount)}"`:''}>
+      <td class="datecell">
+        <div class="datestep">
+          <button class="stepbtn rowDayPrev" data-id="${e.id}" title="Ein Tag zurück">‹</button>
+          <input type="date" data-id="${e.id}" data-field="date" value="${e.date}" />
+          <button class="stepbtn rowDayNext" data-id="${e.id}" title="Ein Tag vor">›</button>
+        </div>
+      </td>
+      <td><input type="text" class="descInput" data-id="${e.id}" data-field="description" value="${escapeHtml(e.description||'')}" placeholder="Beschreibung" /></td>
+      <td class="num">
+        <input type="text" inputmode="decimal" class="amountInput" data-id="${e.id}" data-field="amount" value="${amountDisplay(e.amount)}" />
+        ${invalid?'<span class="invalidBadge" title="Aufteilung stimmt nicht mit dem Betrag überein">⚠️</span>':''}
+      </td>
+      <td>
+        <select class="payerSelect" data-id="${e.id}" data-field="paid_by">
+          ${PEOPLE.map(p=>`<option value="${escapeHtml(p)}" ${p===e.paid_by?'selected':''}>${escapeHtml(p)}</option>`).join("")}
+        </select>
+      </td>
+      <td>
+        <select class="splitSelect" data-id="${e.id}" data-field="split_type">
+          <option value="equal" ${isEqual?'selected':''}>Alle gleich</option>
+          <option value="individual" ${!isEqual?'selected':''}>Individuell</option>
+        </select>
+      </td>
+      ${PEOPLE.map(p=>`
+        <td class="num">
+          <input type="text" inputmode="decimal" class="shareInput" data-id="${e.id}" data-field="share" data-person="${escapeHtml(p)}"
+            value="${amountDisplay(shares[p]||0)}" ${isEqual?'disabled':''} />
+        </td>
+      `).join("")}
+      <td class="num"><button class="del" data-id="${e.id}" title="Löschen">🗑️</button></td>
+    </tr>`;
   }
 
   function renderTable(){
     const tb = $("tbody");
     if(EXPENSES.length===0){
-      tb.innerHTML = `<tr><td colspan="6" class="empty">Noch keine Ausgaben — füg die erste hinzu 🌞</td></tr>`;
-      return;
+      tb.innerHTML = `<tr><td colspan="${6+PEOPLE.length}" class="empty">Noch keine Ausgaben — füg die erste über „➕ Neue Ausgabe" hinzu 🌞</td></tr>`;
+    } else {
+      tb.innerHTML = EXPENSES.map(rowHtml).join("");
     }
-    tb.innerHTML = EXPENSES.map(e=>`
-      <tr>
-        <td style="white-space:nowrap">${fmtDate(e.date)}</td>
-        <td>${escapeHtml(e.description)}</td>
-        <td class="num">${euro(e.amount)}</td>
-        <td><span class="payer">${ava(e.paid_by)} ${e.paid_by}</span></td>
-        <td>${e.split_type==="accommodation"
-              ? '<span class="pill acc">Unterkunft</span>'
-              : '<span class="pill equal">Gleich</span>'}</td>
-        <td class="num"><button class="del" data-id="${e.id}" title="Löschen">🗑️</button></td>
-      </tr>
-    `).join("");
-    tb.querySelectorAll(".del").forEach(b=>b.addEventListener("click", ()=>removeExpense(b.dataset.id)));
+    attachRowHandlers();
   }
 
-  function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function attachRowHandlers(){
+    $("tbody").querySelectorAll("[data-field]").forEach(el=>{
+      el.addEventListener("change", ()=>onFieldChange(el.dataset.id, el.dataset.field, el));
+    });
+    $("tbody").querySelectorAll(".del").forEach(b=>b.addEventListener("click", ()=>removeExpense(b.dataset.id)));
+    $("tbody").querySelectorAll(".rowDayPrev").forEach(b=>b.addEventListener("click", ()=>stepRowDate(b.dataset.id, -1)));
+    $("tbody").querySelectorAll(".rowDayNext").forEach(b=>b.addEventListener("click", ()=>stepRowDate(b.dataset.id, 1)));
+  }
 
   function renderAll(){ renderTotals(); renderSettle(); renderTable(); }
 
   /* ---------- Aktionen ---------- */
-  async function refresh(){ EXPENSES = await store.list(); renderAll(); }
+  async function refresh(showSpin=false){
+    if(showSpin){ $("syncBtn").classList.add("busy"); }
+    EXPENSES = await store.list();
+    const active = document.activeElement;
+    const editingTable = active && active.closest && active.closest("#tbody");
+    renderTotals();
+    renderSettle();
+    if(!editingTable) renderTable();
+    if(showSpin){ setTimeout(()=>$("syncBtn").classList.remove("busy"), 350); }
+  }
 
-  async function addExpense(){
-    const date = $("fDate").value || todayISO();
-    const description = $("fDesc").value.trim();
-    const amount = parseAmount($("fAmount").value);
-    const paid_by = $("fPayer").value;
-    const split_type = $("fSplit").value;
-    if(!description){ alert("Bitte eine kurze Beschreibung eintragen."); return; }
-    if(isNaN(amount) || amount<=0){ alert("Bitte einen gültigen Betrag eintragen."); return; }
-    const row = await store.add({date, description, amount:round2(amount), paid_by, split_type});
-    if(row){
-      $("fDesc").value=""; $("fAmount").value="";
-      await refresh();
+  async function onFieldChange(id, field, el){
+    const exp = EXPENSES.find(e=>e.id===id);
+    if(!exp) return;
+    if(field==="date"){
+      exp.date = el.value || todayISO();
+      await store.update(id, {date: exp.date});
+    } else if(field==="description"){
+      exp.description = el.value;
+      await store.update(id, {description: exp.description});
+    } else if(field==="amount"){
+      exp.amount = round2(parseAmount(el.value));
+      if(exp.split_type!=="individual"){ exp.shares = equalSplit(exp.amount); }
+      await store.update(id, {amount: exp.amount, shares: exp.shares});
+    } else if(field==="paid_by"){
+      exp.paid_by = el.value;
+      await store.update(id, {paid_by: exp.paid_by});
+    } else if(field==="split_type"){
+      exp.split_type = el.value;
+      if(exp.split_type!=="individual"){ exp.shares = equalSplit(exp.amount); }
+      await store.update(id, {split_type: exp.split_type, shares: exp.shares});
+    } else if(field==="share"){
+      const person = el.dataset.person;
+      exp.shares = {...(exp.shares||{}), [person]: round2(parseAmount(el.value))};
+      await store.update(id, {shares: exp.shares});
     }
+    renderAll();
+  }
+
+  async function stepRowDate(id, delta){
+    const exp = EXPENSES.find(e=>e.id===id); if(!exp) return;
+    const d = new Date((exp.date||todayISO())+"T00:00:00");
+    d.setDate(d.getDate()+delta);
+    d.setMinutes(d.getMinutes()-d.getTimezoneOffset());
+    exp.date = d.toISOString().slice(0,10);
+    await store.update(id, {date: exp.date});
+    renderAll();
+  }
+
+  async function addBlankRow(){
+    const amount = 0;
+    const row = {date: todayISO(), description:"", amount, paid_by: DEFAULT_PAYER, split_type:"equal", shares: equalSplit(amount)};
+    await store.add(row);
+    await refresh();
   }
 
   async function removeExpense(id){
@@ -435,39 +520,45 @@
     await refresh();
   }
 
-  function stepDate(delta){
-    const cur = $("fDate").value || todayISO();
-    const d = new Date(cur+"T00:00:00");
-    d.setDate(d.getDate()+delta);
-    d.setMinutes(d.getMinutes()-d.getTimezoneOffset());
-    $("fDate").value = d.toISOString().slice(0,10);
+  /* ---------- Live-Sync (Supabase Realtime) ---------- */
+  function subscribeRealtime(){
+    if(!sb) return;
+    sb.channel("expenses-live")
+      .on("postgres_changes", {event:"*", schema:"public", table:"expenses"}, ()=>{ refresh(); })
+      .subscribe((status)=>{
+        if(status==="SUBSCRIBED" && !tableMissing){
+          $("statusDot").className="dot on";
+          $("statusText").textContent="live synchronisiert 🟢";
+        }
+      });
   }
 
   /* ---------- Seed: Unterkunft 856 € beim ersten Start ---------- */
   async function seedIfEmpty(){
     const cur = await store.list();
+    if(tableMissing) return;
     if(cur.length===0){
-      await store.add({date: todayISO(), description:"Unterkunft", amount:856, paid_by:"Tina", split_type:"accommodation"});
+      const shares = {};
+      PEOPLE.forEach(p=>{ shares[p] = HALF_SHARE.has(p) ? 47.56 : 95.11; });
+      await store.add({date: todayISO(), description:"Unterkunft", amount:856, paid_by:DEFAULT_PAYER, split_type:"individual", shares});
     }
   }
 
   /* ---------- Init ---------- */
   function init(){
-    // Personen in Selects
-    $("fPayer").innerHTML = PEOPLE.map(p=>`<option value="${p}"${p===DEFAULT_PAYER?" selected":""}>${p}</option>`).join("");
-    $("fDate").value = todayISO();
+    renderHead();
 
-    // Status-Anzeige
     if(usingSupabase && sb){ $("statusDot").className="dot on"; $("statusText").textContent="mit Supabase verbunden"; }
     else { $("statusDot").className="dot off"; $("statusText").textContent="lokal gespeichert (noch kein Supabase)"; }
 
-    $("dayPrev").addEventListener("click", ()=>stepDate(-1));
-    $("dayNext").addEventListener("click", ()=>stepDate(1));
-    $("addBtn").addEventListener("click", addExpense);
-    $("fAmount").addEventListener("keydown", (e)=>{ if(e.key==="Enter") addExpense(); });
-    $("fDesc").addEventListener("keydown", (e)=>{ if(e.key==="Enter") $("fAmount").focus(); });
+    $("syncBtn").addEventListener("click", ()=>refresh(true));
+    $("addRowBtn").addEventListener("click", addBlankRow);
 
-    seedIfEmpty().then(refresh);
+    document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) refresh(); });
+    window.addEventListener("focus", ()=>refresh());
+
+    subscribeRealtime();
+    seedIfEmpty().then(()=>refresh());
   }
   init();
   </script>

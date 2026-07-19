@@ -6,31 +6,43 @@ Trägt Ausgaben tabellarisch ein und rechnet automatisch aus, **wer wem was schu
 
 ## Features
 - Schöne, freundliche Sommer-Optik 🌊
-- Ausgaben-Tabelle mit Datum, Beschreibung, Betrag, Zahler und Aufteilung
-- Datum ist vorausgefüllt (heute) und lässt sich mit **‹ ›** tageweise ändern
-- Zwei Aufteilungen:
-  - **Gleich** – auf alle 10 Personen zu gleichen Teilen
-  - **Unterkunft** – Paare teilen sich ein Zimmer: Person 1 zahlt voll, Person 2 nur 50 %
-    (halber Anteil: **Lisa** mit Denis, **Natalia +1** mit Natalia)
-- Automatische Abrechnung mit minimaler Anzahl Zahlungen
-- Speicherung in **Supabase** (alle sehen dieselben Daten). Ohne Supabase-Konfiguration
-  speichert die App lokal im Browser (Fallback zum Ausprobieren).
+- Alles direkt in der Tabelle editierbar (wie eine Mini-Kalkulationstabelle):
+  Datum, Beschreibung, Betrag, Gezahlt von, Aufteilungstyp, und eine Spalte pro Person
+- Datum lässt sich pro Zeile mit **‹ ›** tageweise ändern
+- Zwei Aufteilungstypen:
+  - **Alle gleich** – Betrag wird automatisch auf alle 10 Personen verteilt (Personen-Spalten gesperrt)
+  - **Individuell** – Betrag pro Person selbst eintragen; die Summe muss dem Betrag
+    entsprechen, sonst bleibt die Zeile rot markiert (⚠️)
+- Neue Zeile über den **➕ Neue Ausgabe**-Button unter der Tabelle
+- Unterkunft (856 €) ist vorbefüllt: Paare teilen sich ein Zimmer, Person 1 zahlt voll,
+  Person 2 nur 50 % (halber Anteil: **Lisa** mit Denis, **Natalia +1** mit Natalia) –
+  als „Individuell"-Zeile mit passend vorausgefüllten Beträgen
+- Abrechnung am Ende der Tabelle: **wer schuldet Tina was** (bzw. umgekehrt)
+- **Live-Sync über Supabase** (Realtime): Änderungen erscheinen sofort auf allen
+  Handys. Zusätzlich „🔄 Aktualisieren"-Button und Auto-Refresh beim Öffnen der App.
+- **Als App installierbar** (Home-Bildschirm / „Zum Startbildschirm hinzufügen").
 
 ## Personen
 Jacob, Andy, Ralf, Denis, Lisa, Natalia, Natalia +1, Thorsten, Tina, Abel
 
-## Supabase anbinden
-1. In [supabase.com](https://supabase.com) ein Projekt öffnen → **SQL Editor** → dieses SQL ausführen:
+## Supabase
+Die App ist bereits mit dem (gemeinsamen) Supabase-Projekt verbunden – dieselbe
+Instanz wie kitchenMagic. URL + öffentlicher Key stehen oben im `<script>` in
+`index.html`.
+
+**Einmalig** muss die Tabelle angelegt werden: in [supabase.com](https://supabase.com)
+das Projekt öffnen → **SQL Editor** → dieses SQL ausführen:
 
 ```sql
 create table if not exists public.expenses (
   id          uuid primary key default gen_random_uuid(),
   created_at  timestamptz not null default now(),
   date        date not null,
-  description text not null,
-  amount      numeric not null,
+  description text not null default '',
+  amount      numeric not null default 0,
   paid_by     text not null default 'Tina',
-  split_type  text not null default 'equal'   -- 'equal' oder 'accommodation'
+  split_type  text not null default 'equal',   -- 'equal' oder 'individual'
+  shares      jsonb not null default '{}'::jsonb  -- {"Jacob": 95.11, ...} Betrag pro Person
 );
 
 -- Row Level Security an, aber für diese kleine Trip-Kasse alles erlauben:
@@ -40,22 +52,27 @@ create policy "edersee_all_read"   on public.expenses for select using (true);
 create policy "edersee_all_insert" on public.expenses for insert with check (true);
 create policy "edersee_all_update" on public.expenses for update using (true) with check (true);
 create policy "edersee_all_delete" on public.expenses for delete using (true);
+
+-- Live-Sync einschalten (Realtime):
+alter publication supabase_realtime add table public.expenses;
 ```
 
-2. **Project Settings → API** → `Project URL` und `anon public` key kopieren.
-3. In `index.html` oben im `<script>` die beiden Zeilen ersetzen:
+Danach zeigt der Status oben in der App „live synchronisiert 🟢“ und alle Geräte
+sehen sofort denselben Stand.
 
-```js
-const SUPABASE_URL = "https://xxxx.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOi...";
+**Falls die Tabelle schon (mit altem Stand) existiert** und die App „Spalte 'shares'
+fehlt“ meldet, reicht diese Migration statt `create table`:
+
+```sql
+alter table public.expenses add column if not exists shares jsonb not null default '{}'::jsonb;
+alter table public.expenses alter column description set default '';
+alter table public.expenses alter column amount set default 0;
+alter publication supabase_realtime add table public.expenses;
 ```
 
-4. Speichern, committen, pushen. Fertig – der Status oben in der App zeigt dann
-   „mit Supabase verbunden“ 🟢.
-
-> Hinweis: Der `anon`-Key ist öffentlich sichtbar (steht im Browser). Für diese
-> private Trip-Kasse ist das ok. Die Daten sind für jeden mit dem Link les- und
-> schreibbar – bitte nicht für Sensibles nutzen.
+> Hinweis: Der öffentliche Key steht im Browser sichtbar. Für diese private
+> Trip-Kasse ist das ok – die Daten sind für jeden mit dem Link les- und
+> schreibbar, also nichts Sensibles eintragen.
 
 ## Online stellen (GitHub Pages)
 1. Repo-Einstellungen → **Settings → Pages**
