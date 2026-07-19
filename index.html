@@ -90,22 +90,10 @@
     }
     .card h2 .emoji{font-size:20px}
 
-    /* Summary */
-    .totals{display:flex;flex-wrap:wrap;gap:12px}
-    .stat{
-      flex:1 1 140px;
-      background:linear-gradient(160deg,#fff,#fff8ec);
-      border:1px solid var(--line);border-radius:16px;padding:12px 14px;
-    }
-    .stat .k{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
-    .stat .v{font-size:22px;font-weight:800;margin-top:2px}
-    .stat .v.coral{color:var(--coral-d)}
-    .stat .v.teal{color:var(--teal-d)}
-
     /* Settlement list */
     .settle{display:flex;flex-direction:column;gap:10px}
     .owe{
-      display:flex;align-items:center;gap:12px;
+      display:flex;align-items:center;gap:12px;flex-wrap:wrap;
       background:linear-gradient(100deg,#fff,#fff6ef);
       border:1px solid var(--line);border-radius:14px;padding:10px 12px;
     }
@@ -114,13 +102,22 @@
       display:grid;place-items:center;color:#fff;font-weight:700;font-size:14px;
       box-shadow:inset 0 -3px 8px rgba(0,0,0,.12);
     }
-    .owe .txt{flex:1;line-height:1.25}
+    .owe .txt{flex:1;line-height:1.25;min-width:120px}
     .owe .txt b{font-weight:800}
     .owe .amt{
       font-weight:800;color:var(--coral-d);white-space:nowrap;font-size:16px;
     }
     .owe .arrow{color:var(--muted);font-size:13px}
     .settle-empty{color:var(--muted);text-align:center;padding:10px}
+    .paypalBtn{
+      appearance:none;text-decoration:none;cursor:pointer;font:inherit;font-weight:800;font-size:13px;
+      color:#fff;background:linear-gradient(160deg,#0070ba,#003087);
+      padding:8px 14px;border-radius:12px;white-space:nowrap;
+      display:inline-flex;align-items:center;gap:6px;box-shadow:0 6px 14px rgba(0,48,135,.25);
+      transition:transform .08s, filter .15s;
+    }
+    .paypalBtn:hover{filter:brightness(1.08)}
+    .paypalBtn:active{transform:scale(.96)}
 
     input,select{
       font:inherit;color:var(--ink);
@@ -198,12 +195,6 @@
       </div>
     </header>
 
-    <!-- Übersicht -->
-    <section class="card">
-      <h2><span class="emoji">💶</span> Übersicht</h2>
-      <div class="totals" id="totals"></div>
-    </section>
-
     <!-- Tabelle -->
     <section class="card">
       <h2><span class="emoji">📋</span> Alle Ausgaben</h2>
@@ -249,6 +240,8 @@
   // Wer im Zimmer-Paar nur den halben Unterkunfts-Anteil zahlt (nur für die Vorbefüllung der Unterkunft):
   const HALF_SHARE = new Set(["Lisa","Natalia +1"]);
   const DEFAULT_PAYER = "Tina";
+  const PAYPAL_ME_USERNAME = "Tinasbirthday";
+  const paypalLink = (amount)=>`https://paypal.me/${PAYPAL_ME_USERNAME}/${amount.toFixed(2)}EUR`;
 
   /* ---------- Farben pro Person (für Avatare) ---------- */
   const PALETTE = ["#ff8a5c","#12b3a0","#ff6b8a","#f6a83b","#5aa9e6","#9b6bd6","#3fc37a","#e0567f","#0d9587","#f5713f"];
@@ -362,16 +355,6 @@
     return `<span class="ava" style="background:${colorOf(name)}">${initials(name)}</span>`;
   }
 
-  function renderTotals(){
-    const total = EXPENSES.reduce((s,e)=>s+(Number(e.amount)||0),0);
-    const perPerson = total / PEOPLE.length;
-    $("totals").innerHTML = `
-      <div class="stat"><div class="k">Gesamt</div><div class="v coral">${euro(total)}</div></div>
-      <div class="stat"><div class="k">Ausgaben</div><div class="v">${EXPENSES.length}</div></div>
-      <div class="stat"><div class="k">Ø pro Person</div><div class="v teal">${euro(perPerson)}</div></div>
-    `;
-  }
-
   function renderSettle(){
     const bal = computeBalances(EXPENSES);
     const rows = PEOPLE.filter(p=>p!==DEFAULT_PAYER).map(p=>({p, amt: round2(-bal[p])}));
@@ -383,7 +366,7 @@
     }
     el.innerHTML = withDebt.map(r=>{
       if(r.amt > 0){
-        return `<div class="owe">${ava(r.p)}<div class="txt"><b>${escapeHtml(r.p)}</b> <span class="arrow">schuldet</span> <b>${DEFAULT_PAYER}</b></div><div class="amt">${euro(r.amt)}</div></div>`;
+        return `<div class="owe">${ava(r.p)}<div class="txt"><b>${escapeHtml(r.p)}</b> <span class="arrow">schuldet</span> <b>${DEFAULT_PAYER}</b></div><div class="amt">${euro(r.amt)}</div><a class="paypalBtn" href="${paypalLink(r.amt)}" target="_blank" rel="noopener">💸 Zahlen</a></div>`;
       }
       return `<div class="owe">${ava(DEFAULT_PAYER)}<div class="txt"><b>${DEFAULT_PAYER}</b> <span class="arrow">schuldet</span> <b>${escapeHtml(r.p)}</b></div><div class="amt">${euro(-r.amt)}</div></div>`;
     }).join("");
@@ -459,7 +442,7 @@
     $("tbody").querySelectorAll(".rowDayNext").forEach(b=>b.addEventListener("click", ()=>stepRowDate(b.dataset.id, 1)));
   }
 
-  function renderAll(){ renderTotals(); renderSettle(); renderTable(); }
+  function renderAll(){ renderSettle(); renderTable(); }
 
   /* ---------- Aktionen ---------- */
   async function refresh(showSpin=false){
@@ -467,7 +450,6 @@
     EXPENSES = await store.list();
     const active = document.activeElement;
     const editingTable = active && active.closest && active.closest("#tbody");
-    renderTotals();
     renderSettle();
     if(!editingTable) renderTable();
     if(showSpin){ setTimeout(()=>$("syncBtn").classList.remove("busy"), 350); }
