@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Edersee Kosten 🌞</title>
+  <style>
+    :root{
+      --sky1:#8fe3d6;      /* türkis wie der See */
+      --sky2:#bff0e4;
+      --sand:#fff5e1;
+      --card:#ffffff;
+      --ink:#2b3a3a;
+      --muted:#7c8a89;
+      --line:#eadfc9;
+      --coral:#ff8a5c;
+      --coral-d:#f5713f;
+      --sun:#ffd166;
+      --teal:#12b3a0;
+      --teal-d:#0d9587;
+      --rose:#ff6b8a;
+      --shadow:0 10px 30px rgba(20,80,80,.12);
+    }
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{margin:0;min-height:100%}
+    body{
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+      color:var(--ink);
+      background:
+        radial-gradient(1100px 480px at 85% -8%, rgba(255,209,102,.55) 0%, transparent 60%),
+        radial-gradient(900px 420px at 5% 0%, rgba(255,138,92,.35) 0%, transparent 55%),
+        linear-gradient(170deg, var(--sky1) 0%, var(--sky2) 22%, var(--sand) 60%);
+      background-attachment:fixed;
+      min-height:100dvh;
+      -webkit-font-smoothing:antialiased;
+    }
+    .wrap{max-width:900px;margin:0 auto;padding:22px 16px 80px}
+
+    header.hero{
+      text-align:center;
+      padding:18px 8px 6px;
+    }
+    header.hero h1{
+      margin:.1em 0 .1em;
+      font-size:clamp(26px,6vw,40px);
+      letter-spacing:-.02em;
+    }
+    header.hero p{margin:.2em 0;color:#4c5c5b;font-weight:500}
+    .status{
+      display:inline-flex;align-items:center;gap:6px;
+      font-size:12px;color:var(--muted);
+      background:rgba(255,255,255,.6);border:1px solid var(--line);
+      padding:3px 10px;border-radius:999px;margin-top:6px;
+    }
+    .dot{width:8px;height:8px;border-radius:50%}
+    .dot.on{background:#22c55e}.dot.off{background:#f59e0b}
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:20px;
+      box-shadow:var(--shadow);
+      padding:18px;
+      margin:16px 0;
+    }
+    .card h2{
+      margin:0 0 12px;font-size:17px;display:flex;align-items:center;gap:8px;
+    }
+    .card h2 .emoji{font-size:20px}
+
+    /* Summary */
+    .totals{display:flex;flex-wrap:wrap;gap:12px}
+    .stat{
+      flex:1 1 140px;
+      background:linear-gradient(160deg,#fff,#fff8ec);
+      border:1px solid var(--line);border-radius:16px;padding:12px 14px;
+    }
+    .stat .k{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+    .stat .v{font-size:22px;font-weight:800;margin-top:2px}
+    .stat .v.coral{color:var(--coral-d)}
+    .stat .v.teal{color:var(--teal-d)}
+
+    /* Settlement list */
+    .settle{display:flex;flex-direction:column;gap:10px}
+    .owe{
+      display:flex;align-items:center;gap:12px;
+      background:linear-gradient(100deg,#fff,#fff6ef);
+      border:1px solid var(--line);border-radius:14px;padding:10px 12px;
+    }
+    .ava{
+      width:38px;height:38px;border-radius:50%;flex:0 0 auto;
+      display:grid;place-items:center;color:#fff;font-weight:700;font-size:14px;
+      box-shadow:inset 0 -3px 8px rgba(0,0,0,.12);
+    }
+    .owe .txt{flex:1;line-height:1.25}
+    .owe .txt b{font-weight:800}
+    .owe .amt{
+      font-weight:800;color:var(--coral-d);white-space:nowrap;font-size:16px;
+    }
+    .owe .arrow{color:var(--muted);font-size:13px}
+    .settle-empty{color:var(--muted);text-align:center;padding:10px}
+
+    /* Add form */
+    .add{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:10px;
+    }
+    .field label{font-size:12px;color:var(--muted);font-weight:600;display:block;margin-bottom:4px}
+    .row2{display:flex;gap:10px;flex-wrap:wrap}
+    .row2 .field{flex:1 1 140px}
+    input,select{
+      width:100%;font:inherit;color:var(--ink);
+      background:#fffdf8;border:1.5px solid var(--line);border-radius:12px;
+      padding:10px 12px;outline:none;transition:border-color .15s, box-shadow .15s;
+    }
+    input:focus,select:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(18,179,160,.15)}
+    .datestep{display:flex;align-items:center;gap:8px}
+    .datestep input{text-align:center}
+    .stepbtn{
+      flex:0 0 auto;width:42px;height:42px;border-radius:12px;border:1.5px solid var(--line);
+      background:#fffdf8;font-size:18px;cursor:pointer;color:var(--teal-d);font-weight:800;
+      display:grid;place-items:center;transition:transform .08s, background .15s;
+    }
+    .stepbtn:active{transform:scale(.92)}
+    .stepbtn:hover{background:#f3fbf9}
+    .btn{
+      appearance:none;border:none;cursor:pointer;font:inherit;font-weight:800;
+      color:#fff;background:linear-gradient(160deg,var(--coral),var(--coral-d));
+      padding:12px 16px;border-radius:14px;box-shadow:0 8px 20px rgba(245,113,63,.28);
+      transition:transform .08s, filter .15s;
+    }
+    .btn:active{transform:translateY(1px)}
+    .btn:hover{filter:brightness(1.03)}
+    .btn.full{width:100%}
+
+    /* Table */
+    .tablewrap{overflow-x:auto;margin:0 -4px}
+    table{width:100%;border-collapse:collapse;font-size:14px;min-width:560px}
+    th,td{padding:10px 8px;text-align:left;border-bottom:1px solid var(--line);vertical-align:middle}
+    th{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:700}
+    td.num,th.num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+    tr:last-child td{border-bottom:none}
+    .pill{
+      display:inline-block;font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;
+    }
+    .pill.equal{background:#e6f7f4;color:var(--teal-d)}
+    .pill.acc{background:#fff0e6;color:var(--coral-d)}
+    .payer{display:inline-flex;align-items:center;gap:6px}
+    .payer .ava{width:24px;height:24px;font-size:11px}
+    .del{
+      background:none;border:none;cursor:pointer;color:#c98b8b;font-size:16px;padding:4px 6px;border-radius:8px;
+    }
+    .del:hover{background:#fdeaea;color:#e05555}
+    .empty{color:var(--muted);text-align:center;padding:18px}
+    footer{text-align:center;color:#5a6a69;font-size:12px;margin-top:24px}
+    .note{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.5}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <div style="font-size:40px;line-height:1">🌞🏖️</div>
+      <h1>Edersee&nbsp;Kasse</h1>
+      <p>Wer schuldet wem was — ganz entspannt aufgeteilt.</p>
+      <div class="status"><span id="statusDot" class="dot off"></span><span id="statusText">lokal gespeichert</span></div>
+    </header>
+
+    <!-- Übersicht -->
+    <section class="card">
+      <h2><span class="emoji">💶</span> Übersicht</h2>
+      <div class="totals" id="totals"></div>
+    </section>
+
+    <!-- Abrechnung -->
+    <section class="card">
+      <h2><span class="emoji">🤝</span> Abrechnung</h2>
+      <div class="settle" id="settle"></div>
+    </section>
+
+    <!-- Neue Ausgabe -->
+    <section class="card">
+      <h2><span class="emoji">➕</span> Neue Ausgabe</h2>
+      <div class="add">
+        <div class="field">
+          <label>Datum</label>
+          <div class="datestep">
+            <button class="stepbtn" id="dayPrev" title="Ein Tag zurück">‹</button>
+            <input type="date" id="fDate" />
+            <button class="stepbtn" id="dayNext" title="Ein Tag vor">›</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Beschreibung</label>
+          <input type="text" id="fDesc" placeholder="z. B. Einkauf, Grillkohle, Sprit …" />
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>Betrag (€)</label>
+            <input type="text" inputmode="decimal" id="fAmount" placeholder="0,00" />
+          </div>
+          <div class="field">
+            <label>Bezahlt von</label>
+            <select id="fPayer"></select>
+          </div>
+          <div class="field">
+            <label>Aufteilung</label>
+            <select id="fSplit">
+              <option value="equal">Gleich (alle)</option>
+              <option value="accommodation">Unterkunft (Paare 50 %)</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn full" id="addBtn">Hinzufügen 🌴</button>
+        <div class="note">
+          <b>Unterkunft-Aufteilung:</b> Paare teilen sich ein Zimmer — Person&nbsp;1 zahlt voll, Person&nbsp;2 nur 50&nbsp;%.
+          Halber Anteil: <b>Lisa</b> (mit Denis) und <b>Natalia&nbsp;+1</b> (mit Natalia).
+        </div>
+      </div>
+    </section>
+
+    <!-- Tabelle -->
+    <section class="card">
+      <h2><span class="emoji">📋</span> Alle Ausgaben</h2>
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Datum</th>
+              <th>Beschreibung</th>
+              <th class="num">Betrag</th>
+              <th>Bezahlt von</th>
+              <th>Aufteilung</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer>Edersee 2026 · gemacht mit 🌞 &amp; 💚</footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+  /* ============================================================
+     KONFIGURATION — hier Supabase eintragen (siehe README/SQL)
+     Solange die Platzhalter stehen, speichert die App lokal im
+     Browser (localStorage). Sobald URL + Key gesetzt sind, nutzt
+     sie automatisch Supabase, sodass alle dieselben Daten sehen.
+     ============================================================ */
+  const SUPABASE_URL = "DEINE_SUPABASE_URL";
+  const SUPABASE_ANON_KEY = "DEIN_SUPABASE_ANON_KEY";
+
+  const PEOPLE = ["Jacob","Andy","Ralf","Denis","Lisa","Natalia","Natalia +1","Thorsten","Tina","Abel"];
+  // Wer im Zimmer-Paar nur den halben Unterkunfts-Anteil zahlt:
+  const HALF_SHARE = new Set(["Lisa","Natalia +1"]);
+  const DEFAULT_PAYER = "Tina";
+
+  /* ---------- Farben pro Person (für Avatare) ---------- */
+  const PALETTE = ["#ff8a5c","#12b3a0","#ff6b8a","#f6a83b","#5aa9e6","#9b6bd6","#3fc37a","#e0567f","#0d9587","#f5713f"];
+  const colorOf = (name)=>PALETTE[PEOPLE.indexOf(name) % PALETTE.length] || "#12b3a0";
+  const initials = (name)=>name.replace("+1","").trim().slice(0,2).toUpperCase();
+
+  /* ---------- Helpers ---------- */
+  const euro = (n)=>Number(n||0).toLocaleString("de-DE",{style:"currency",currency:"EUR"});
+  const round2 = (n)=>Math.round((n+Number.EPSILON)*100)/100;
+  const todayISO = ()=>{ const d=new Date(); d.setMinutes(d.getMinutes()-d.getTimezoneOffset()); return d.toISOString().slice(0,10); };
+  const fmtDate = (iso)=>{ try{ const [y,m,d]=iso.split("-"); return `${d}.${m}.${y.slice(2)}`; }catch(e){ return iso; } };
+  const parseAmount = (s)=>{ const v=parseFloat(String(s).replace(/\./g,"").replace(",",".")); return isNaN(v)?NaN:v; };
+
+  /* ---------- Storage: Supabase oder localStorage ---------- */
+  const usingSupabase = SUPABASE_URL.startsWith("http") && SUPABASE_ANON_KEY.length > 20;
+  let sb = null;
+  if(usingSupabase && window.supabase){ sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); }
+
+  const LS_KEY = "edersee_expenses_v1";
+  const store = {
+    async list(){
+      if(sb){
+        const {data,error} = await sb.from("expenses").select("*").order("date",{ascending:true}).order("created_at",{ascending:true});
+        if(error){ console.error(error); return []; }
+        return data;
+      }
+      return JSON.parse(localStorage.getItem(LS_KEY) || "[]");
+    },
+    async add(e){
+      if(sb){
+        const {data,error} = await sb.from("expenses").insert(e).select();
+        if(error){ alert("Speichern fehlgeschlagen: "+error.message); return null; }
+        return data[0];
+      }
+      const arr = JSON.parse(localStorage.getItem(LS_KEY) || "[]");
+      const row = {id: crypto.randomUUID(), created_at:new Date().toISOString(), ...e};
+      arr.push(row); localStorage.setItem(LS_KEY, JSON.stringify(arr)); return row;
+    },
+    async remove(id){
+      if(sb){
+        const {error} = await sb.from("expenses").delete().eq("id", id);
+        if(error){ alert("Löschen fehlgeschlagen: "+error.message); }
+        return;
+      }
+      const arr = JSON.parse(localStorage.getItem(LS_KEY) || "[]").filter(r=>r.id!==id);
+      localStorage.setItem(LS_KEY, JSON.stringify(arr));
+    }
+  };
+
+  /* ---------- Aufteilungs-Logik ---------- */
+  function weightsFor(splitType){
+    const w = {};
+    for(const p of PEOPLE){
+      if(splitType==="accommodation") w[p] = HALF_SHARE.has(p) ? 0.5 : 1;
+      else w[p] = 1;
+    }
+    return w;
+  }
+
+  function computeBalances(expenses){
+    const bal = {}; PEOPLE.forEach(p=>bal[p]=0);
+    for(const e of expenses){
+      const amt = Number(e.amount)||0;
+      const w = weightsFor(e.split_type);
+      const totalW = PEOPLE.reduce((s,p)=>s+w[p],0);
+      if(bal[e.paid_by]!==undefined) bal[e.paid_by] += amt;
+      for(const p of PEOPLE) bal[p] -= amt * w[p]/totalW;
+    }
+    return bal;
+  }
+
+  // Minimale Anzahl Zahlungen: Schuldner -> Gläubiger
+  function settle(bal){
+    const creditors=[], debtors=[];
+    for(const p of PEOPLE){
+      const v = round2(bal[p]);
+      if(v > 0.005) creditors.push({p, v});
+      else if(v < -0.005) debtors.push({p, v:-v});
+    }
+    creditors.sort((a,b)=>b.v-a.v); debtors.sort((a,b)=>b.v-a.v);
+    const res=[]; let i=0, j=0;
+    while(i<debtors.length && j<creditors.length){
+      const amt = Math.min(debtors[i].v, creditors[j].v);
+      res.push({from:debtors[i].p, to:creditors[j].p, amount:round2(amt)});
+      debtors[i].v -= amt; creditors[j].v -= amt;
+      if(debtors[i].v < 0.005) i++;
+      if(creditors[j].v < 0.005) j++;
+    }
+    return res;
+  }
+
+  /* ---------- Rendering ---------- */
+  const $ = (id)=>document.getElementById(id);
+  let EXPENSES = [];
+
+  function ava(name, cls=""){
+    return `<span class="ava ${cls}" style="background:${colorOf(name)}">${initials(name)}</span>`;
+  }
+
+  function renderTotals(){
+    const total = EXPENSES.reduce((s,e)=>s+(Number(e.amount)||0),0);
+    const bal = computeBalances(EXPENSES);
+    const tinaPaid = EXPENSES.filter(e=>e.paid_by===DEFAULT_PAYER).reduce((s,e)=>s+(Number(e.amount)||0),0);
+    const perPerson = total / PEOPLE.length;
+    $("totals").innerHTML = `
+      <div class="stat"><div class="k">Gesamt</div><div class="v coral">${euro(total)}</div></div>
+      <div class="stat"><div class="k">Ausgaben</div><div class="v">${EXPENSES.length}</div></div>
+      <div class="stat"><div class="k">Ø pro Person</div><div class="v teal">${euro(perPerson)}</div></div>
+      <div class="stat"><div class="k">${DEFAULT_PAYER} ausgelegt</div><div class="v">${euro(tinaPaid)}</div></div>
+    `;
+  }
+
+  function renderSettle(){
+    const bal = computeBalances(EXPENSES);
+    const res = settle(bal);
+    const el = $("settle");
+    if(res.length===0){
+      el.innerHTML = `<div class="settle-empty">Noch nichts zu begleichen 🌊</div>`;
+      return;
+    }
+    el.innerHTML = res.map(r=>`
+      <div class="owe">
+        ${ava(r.from)}
+        <div class="txt"><b>${r.from}</b> <span class="arrow">schuldet</span> <b>${r.to}</b></div>
+        <div class="amt">${euro(r.amount)}</div>
+      </div>
+    `).join("");
+  }
+
+  function renderTable(){
+    const tb = $("tbody");
+    if(EXPENSES.length===0){
+      tb.innerHTML = `<tr><td colspan="6" class="empty">Noch keine Ausgaben — füg die erste hinzu 🌞</td></tr>`;
+      return;
+    }
+    tb.innerHTML = EXPENSES.map(e=>`
+      <tr>
+        <td style="white-space:nowrap">${fmtDate(e.date)}</td>
+        <td>${escapeHtml(e.description)}</td>
+        <td class="num">${euro(e.amount)}</td>
+        <td><span class="payer">${ava(e.paid_by)} ${e.paid_by}</span></td>
+        <td>${e.split_type==="accommodation"
+              ? '<span class="pill acc">Unterkunft</span>'
+              : '<span class="pill equal">Gleich</span>'}</td>
+        <td class="num"><button class="del" data-id="${e.id}" title="Löschen">🗑️</button></td>
+      </tr>
+    `).join("");
+    tb.querySelectorAll(".del").forEach(b=>b.addEventListener("click", ()=>removeExpense(b.dataset.id)));
+  }
+
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  function renderAll(){ renderTotals(); renderSettle(); renderTable(); }
+
+  /* ---------- Aktionen ---------- */
+  async function refresh(){ EXPENSES = await store.list(); renderAll(); }
+
+  async function addExpense(){
+    const date = $("fDate").value || todayISO();
+    const description = $("fDesc").value.trim();
+    const amount = parseAmount($("fAmount").value);
+    const paid_by = $("fPayer").value;
+    const split_type = $("fSplit").value;
+    if(!description){ alert("Bitte eine kurze Beschreibung eintragen."); return; }
+    if(isNaN(amount) || amount<=0){ alert("Bitte einen gültigen Betrag eintragen."); return; }
+    const row = await store.add({date, description, amount:round2(amount), paid_by, split_type});
+    if(row){
+      $("fDesc").value=""; $("fAmount").value="";
+      await refresh();
+    }
+  }
+
+  async function removeExpense(id){
+    if(!confirm("Diese Ausgabe wirklich löschen?")) return;
+    await store.remove(id);
+    await refresh();
+  }
+
+  function stepDate(delta){
+    const cur = $("fDate").value || todayISO();
+    const d = new Date(cur+"T00:00:00");
+    d.setDate(d.getDate()+delta);
+    d.setMinutes(d.getMinutes()-d.getTimezoneOffset());
+    $("fDate").value = d.toISOString().slice(0,10);
+  }
+
+  /* ---------- Seed: Unterkunft 856 € beim ersten Start ---------- */
+  async function seedIfEmpty(){
+    const cur = await store.list();
+    if(cur.length===0){
+      await store.add({date: todayISO(), description:"Unterkunft", amount:856, paid_by:"Tina", split_type:"accommodation"});
+    }
+  }
+
+  /* ---------- Init ---------- */
+  function init(){
+    // Personen in Selects
+    $("fPayer").innerHTML = PEOPLE.map(p=>`<option value="${p}"${p===DEFAULT_PAYER?" selected":""}>${p}</option>`).join("");
+    $("fDate").value = todayISO();
+
+    // Status-Anzeige
+    if(usingSupabase && sb){ $("statusDot").className="dot on"; $("statusText").textContent="mit Supabase verbunden"; }
+    else { $("statusDot").className="dot off"; $("statusText").textContent="lokal gespeichert (noch kein Supabase)"; }
+
+    $("dayPrev").addEventListener("click", ()=>stepDate(-1));
+    $("dayNext").addEventListener("click", ()=>stepDate(1));
+    $("addBtn").addEventListener("click", addExpense);
+    $("fAmount").addEventListener("keydown", (e)=>{ if(e.key==="Enter") addExpense(); });
+    $("fDesc").addEventListener("keydown", (e)=>{ if(e.key==="Enter") $("fAmount").focus(); });
+
+    seedIfEmpty().then(refresh);
+  }
+  init();
+  </script>
+</body>
+</html>
