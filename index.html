@@ -3,25 +3,28 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Edersee Kosten 🌞</title>
+  <title>Edersee Kosten ⛰️</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="icon.svg" />
-  <meta name="theme-color" content="#8fe3d6" />
+  <meta name="theme-color" content="#8fd6d6" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="Edersee Kasse" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <style>
     :root{
-      --sky1:#8fe3d6;      /* türkis wie der See */
-      --sky2:#bff0e4;
-      --sand:#fff5e1;
+      --sky1:#8fd6d6;      /* dunstiges Bergsee-Türkis */
+      --sky2:#c3e9e2;
+      --meadow:#eef2e1;    /* Bergwiese statt Sandstrand */
+      --mountain:#71909c;  /* Bergsilhouette hell */
+      --mountain-d:#44606c; /* Bergsilhouette dunkel */
+      --pine:#356a4c;      /* Nadelwald */
       --card:#ffffff;
       --ink:#2b3a3a;
       --muted:#7c8a89;
-      --line:#eadfc9;
-      --coral:#ff8a5c;
-      --coral-d:#f5713f;
+      --line:#dfe6d4;
+      --coral:#c98a4f;     /* Wanderweg-Terrakotta statt Beach-Koralle */
+      --coral-d:#a8703c;
       --sun:#ffd166;
       --teal:#12b3a0;
       --teal-d:#0d9587;
@@ -35,9 +38,10 @@
       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
       color:var(--ink);
       background:
-        radial-gradient(1100px 480px at 85% -8%, rgba(255,209,102,.55) 0%, transparent 60%),
-        radial-gradient(900px 420px at 5% 0%, rgba(255,138,92,.35) 0%, transparent 55%),
-        linear-gradient(170deg, var(--sky1) 0%, var(--sky2) 22%, var(--sand) 60%);
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 260'%3E%3Cpath d='M0,150 L120,70 220,120 340,40 460,110 580,50 700,100 820,30 940,90 1060,20 1180,80 1200,60 L1200,260 L0,260 Z' fill='%2371909c' opacity='0.45'/%3E%3Cpath d='M0,200 L100,140 210,180 330,110 440,170 560,100 670,160 790,90 900,150 1020,80 1140,140 1200,120 L1200,260 L0,260 Z' fill='%2344606c' opacity='0.6'/%3E%3Cg fill='%23356a4c' opacity='0.55'%3E%3Cpolygon points='150,260 165,213 180,260'/%3E%3Cpolygon points='168,260 183,220 198,260'/%3E%3Cpolygon points='955,260 970,213 985,260'/%3E%3Cpolygon points='973,260 988,220 1003,260'/%3E%3C/g%3E%3C/svg%3E") top center / 100% auto no-repeat,
+        radial-gradient(1100px 420px at 82% -8%, rgba(255,209,102,.35) 0%, transparent 60%),
+        radial-gradient(900px 420px at 8% 0%, rgba(143,214,214,.4) 0%, transparent 55%),
+        linear-gradient(180deg, var(--mountain) 0%, var(--sky1) 16%, var(--sky2) 36%, var(--meadow) 66%);
       background-attachment:fixed;
       min-height:100dvh;
       -webkit-font-smoothing:antialiased;
@@ -185,7 +189,7 @@
 <body>
   <div class="wrap">
     <header class="hero">
-      <div style="font-size:40px;line-height:1">🌞🏖️</div>
+      <div style="font-size:40px;line-height:1">⛰️🥾</div>
       <h1>Edersee&nbsp;Kasse</h1>
       <p>Wer schuldet wem was — ganz entspannt aufgeteilt.</p>
       <div class="statusbar">
@@ -227,7 +231,7 @@
       <div class="settle" id="settle"></div>
     </section>
 
-    <footer>Edersee 2026 · gemacht mit 🌞 &amp; 💚</footer>
+    <footer>Edersee 2026 · gemacht mit 🏔️ &amp; 🥾</footer>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -439,7 +443,7 @@
   function renderTable(){
     const tb = $("tbody");
     if(EXPENSES.length===0){
-      tb.innerHTML = `<tr><td colspan="${6+PEOPLE.length}" class="empty">Noch keine Ausgaben — füg die erste über „➕ Neue Ausgabe" hinzu 🌞</td></tr>`;
+      tb.innerHTML = `<tr><td colspan="${6+PEOPLE.length}" class="empty">Noch keine Ausgaben — füg die erste über „➕ Neue Ausgabe" hinzu 🥾</td></tr>`;
     } else {
       tb.innerHTML = EXPENSES.map(rowHtml).join("");
     }

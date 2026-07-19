@@ -1,22 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
   <defs>
     <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#8fe3d6"/>
-      <stop offset="0.55" stop-color="#bff0e4"/>
-      <stop offset="1" stop-color="#fff5e1"/>
+      <stop offset="0" stop-color="#71909c"/>
+      <stop offset="0.4" stop-color="#8fd6d6"/>
+      <stop offset="1" stop-color="#eef2e1"/>
     </linearGradient>
   </defs>
   <rect width="512" height="512" rx="112" fill="url(#sky)"/>
-  <circle cx="360" cy="150" r="70" fill="#ffd166"/>
-  <g stroke="#ffd166" stroke-width="14" stroke-linecap="round">
-    <line x1="360" y1="40" x2="360" y2="18"/>
-    <line x1="360" y1="282" x2="360" y2="260"/>
-    <line x1="470" y1="150" x2="492" y2="150"/>
-    <line x1="228" y1="150" x2="250" y2="150"/>
-    <line x1="438" y1="72" x2="454" y2="56"/>
-    <line x1="266" y1="228" x2="282" y2="212"/>
+  <path d="M40 300 L140 150 210 230 300 90 400 260 472 220 L472 300 Z" fill="#44606c" opacity="0.65"/>
+  <path d="M40 320 L120 200 190 270 280 150 380 300 472 260 L472 320 Z" fill="#5d7a86"/>
+  <g fill="#356a4c">
+    <polygon points="120,320 138,270 156,320"/>
+    <polygon points="145,320 163,280 181,320"/>
   </g>
-  <path d="M0 360 q64 -34 128 0 t128 0 t128 0 t128 0 V512 H0 Z" fill="#12b3a0" opacity="0.85"/>
-  <path d="M0 410 q64 -30 128 0 t128 0 t128 0 t128 0 V512 H0 Z" fill="#0d9587"/>
-  <text x="256" y="330" font-family="Segoe UI, Arial, sans-serif" font-size="150" font-weight="800" text-anchor="middle" fill="#ff8a5c">€</text>
+  <path d="M0 370 q64 -30 128 0 t128 0 t128 0 t128 0 V512 H0 Z" fill="#12b3a0" opacity="0.85"/>
+  <path d="M0 415 q64 -26 128 0 t128 0 t128 0 t128 0 V512 H0 Z" fill="#0d9587"/>
+  <text x="256" y="470" font-family="Segoe UI, Arial, sans-serif" font-size="120" font-weight="800" text-anchor="middle" fill="#eef2e1">€</text>
 </svg>
