@@ -77,6 +77,16 @@
     @keyframes spin{to{transform:rotate(360deg)}}
     .syncbtn.busy #syncIcon{display:inline-block;animation:spin .7s linear infinite}
 
+    .tabs{display:flex;justify-content:center;gap:8px;margin:18px 0 4px;flex-wrap:wrap}
+    .tabBtn{
+      appearance:none;cursor:pointer;font:inherit;font-weight:800;font-size:14px;color:var(--muted);
+      background:rgba(255,255,255,.65);border:1.5px solid var(--line);border-radius:999px;padding:8px 18px;
+      transition:background .15s, color .15s, border-color .15s;
+    }
+    .tabBtn:hover{background:#fff}
+    .tabBtn.active{background:linear-gradient(160deg,var(--teal),var(--teal-d));border-color:transparent;color:#fff}
+    .tabPanel[hidden]{display:none}
+
     .card{
       background:var(--card);
       border:1px solid var(--line);
@@ -108,6 +118,16 @@
       font-weight:800;color:var(--coral-d);white-space:nowrap;font-size:16px;
     }
     .owe .arrow{color:var(--muted);font-size:13px}
+    .owe.owe-settled{
+      background:linear-gradient(100deg,#e3f5e1,#d3efce);
+      border-color:#9ed99a;
+    }
+    .settledCheck{
+      display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;
+      color:var(--muted);cursor:pointer;white-space:nowrap;user-select:none;
+    }
+    .owe-settled .settledCheck{color:#2f7a2a}
+    .settledCheck input{width:16px;height:16px;cursor:pointer}
     .settle-empty{color:var(--muted);text-align:center;padding:10px}
     .paypalBtn{
       appearance:none;text-decoration:none;cursor:pointer;font:inherit;font-weight:800;font-size:13px;
@@ -181,6 +201,30 @@
     .addRowBtn:active{transform:scale(.97)}
 
     .invalidBadge{color:var(--red);font-size:14px}
+
+    /* Shoppingliste */
+    .blocksWrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:14px}
+    .block{
+      background:linear-gradient(160deg,#fff,#fbfbf3);border:1px solid var(--line);border-radius:16px;padding:14px;
+      display:flex;flex-direction:column;gap:8px;
+    }
+    .blockHead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+    .blockHead h3{margin:0;font-size:15px;color:var(--pine)}
+    .itemList{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+    .itemList li{
+      display:flex;align-items:center;justify-content:space-between;gap:8px;
+      background:#fffdf8;border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:14px;
+    }
+    .itemList .itemEmpty{color:var(--muted);font-size:13px;text-align:center;padding:6px 0;background:none;border:none}
+    .addItemRow{display:flex;gap:6px}
+    .addItemRow input{flex:1;font-size:13px;padding:7px 9px}
+    .addItemRow button{
+      flex:0 0 auto;border:none;border-radius:10px;background:var(--teal);color:#fff;cursor:pointer;
+      width:34px;font-size:16px;font-weight:800;
+    }
+    .addItemRow button:hover{background:var(--teal-d)}
+    .addBlockWrap{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+    .addBlockWrap input{flex:1 1 200px}
   </style>
 </head>
 <body>
@@ -195,32 +239,51 @@
       </div>
     </header>
 
-    <!-- Tabelle -->
-    <section class="card">
-      <h2><span class="emoji">📋</span> Alle Ausgaben</h2>
-      <div class="tablewrap">
-        <table>
-          <thead>
-            <tr id="theadRow"></tr>
-          </thead>
-          <tbody id="tbody"></tbody>
-        </table>
-      </div>
-      <div class="addRowWrap">
-        <button class="addRowBtn" id="addRowBtn">➕ Neue Ausgabe</button>
-      </div>
-      <div class="note">
-        <b>Aufteilungstyp „Alle gleich":</b> Betrag wird automatisch auf alle 10 Personen verteilt.
-        <b>„Individuell":</b> Betrag selbst pro Person eintragen — die Summe muss dem Betrag entsprechen,
-        sonst bleibt die Zeile rot markiert.
-      </div>
-    </section>
+    <nav class="tabs">
+      <button class="tabBtn active" data-tab="expenses">💶 Kosten</button>
+      <button class="tabBtn" data-tab="shopping">🛒 Shoppingliste</button>
+    </nav>
 
-    <!-- Abrechnung -->
-    <section class="card">
-      <h2><span class="emoji">🤝</span> Wer schuldet Tina was?</h2>
-      <div class="settle" id="settle"></div>
-    </section>
+    <div id="tabExpenses" class="tabPanel">
+      <!-- Tabelle -->
+      <section class="card">
+        <h2><span class="emoji">📋</span> Alle Ausgaben</h2>
+        <div class="tablewrap">
+          <table>
+            <thead>
+              <tr id="theadRow"></tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+        <div class="addRowWrap">
+          <button class="addRowBtn" id="addRowBtn">➕ Neue Ausgabe</button>
+        </div>
+        <div class="note">
+          <b>Aufteilungstyp „Alle gleich":</b> Betrag wird automatisch auf alle 10 Personen verteilt.
+          <b>„Individuell":</b> Betrag selbst pro Person eintragen — die Summe muss dem Betrag entsprechen,
+          sonst bleibt die Zeile rot markiert.
+        </div>
+      </section>
+
+      <!-- Abrechnung -->
+      <section class="card">
+        <h2><span class="emoji">🤝</span> Wer schuldet Tina was?</h2>
+        <div class="settle" id="settle"></div>
+      </section>
+    </div>
+
+    <div id="tabShopping" class="tabPanel" hidden>
+      <!-- Shoppingliste -->
+      <section class="card">
+        <h2><span class="emoji">🛒</span> Shoppingliste</h2>
+        <div class="blocksWrap" id="blocksWrap"></div>
+        <div class="addBlockWrap">
+          <input type="text" id="newBlockName" placeholder="Neuer Block, z. B. Ragout" />
+          <button class="btn" id="addBlockBtn">➕ Block</button>
+        </div>
+      </section>
+    </div>
 
     <footer>Edersee 2026 · gemacht mit 🏔️ &amp; 🥾</footer>
   </div>
@@ -276,7 +339,21 @@
   if(usingSupabase && window.supabase){ sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); }
 
   const LS_KEY = "edersee_expenses_v2";
+  const LS_BLOCKS_KEY = "edersee_shopping_blocks_v1";
+  const LS_ITEMS_KEY = "edersee_shopping_items_v1";
+  const LS_SETTLED_KEY = "edersee_settled_v1";
+
+  function getSettled(){
+    return new Set(JSON.parse(localStorage.getItem(LS_SETTLED_KEY) || "[]"));
+  }
+  function setSettled(person, isSettled){
+    const set = getSettled();
+    if(isSettled) set.add(person); else set.delete(person);
+    localStorage.setItem(LS_SETTLED_KEY, JSON.stringify([...set]));
+  }
+  const FIXED_BLOCK_NAME = "Sonstiges";
   let tableMissing = false;
+  let shoppingTableMissing = false;
 
   function showStorageWarning(error){
     console.error(error);
@@ -336,6 +413,80 @@
     }
   };
 
+  /* ---------- Shoppingliste: Storage ---------- */
+  function showShoppingWarning(error){
+    console.error(error);
+    const msg = (error && error.message) || "";
+    shoppingTableMissing = true;
+    if((error && error.code==="PGRST205") || /schema cache|does not exist/i.test(msg)){
+      $("statusDot").className="dot off";
+      $("statusText").textContent="⚠️ Shoppingliste-Tabellen fehlen – SQL ausführen (siehe README)";
+    } else {
+      $("statusDot").className="dot off";
+      $("statusText").textContent="⚠️ Shoppingliste-Fehler: "+msg;
+    }
+  }
+
+  const shoppingStore = {
+    async listBlocks(){
+      if(sb){
+        const {data,error} = await sb.from("shopping_blocks").select("*").order("created_at",{ascending:true});
+        if(error){ showShoppingWarning(error); return []; }
+        shoppingTableMissing = false;
+        return data;
+      }
+      return JSON.parse(localStorage.getItem(LS_BLOCKS_KEY) || "[]");
+    },
+    async addBlock(b){
+      if(sb){
+        const {data,error} = await sb.from("shopping_blocks").insert(b).select();
+        if(error){ showShoppingWarning(error); return null; }
+        return data[0];
+      }
+      const arr = JSON.parse(localStorage.getItem(LS_BLOCKS_KEY) || "[]");
+      const row = {id: crypto.randomUUID(), created_at:new Date().toISOString(), ...b};
+      arr.push(row); localStorage.setItem(LS_BLOCKS_KEY, JSON.stringify(arr)); return row;
+    },
+    async removeBlock(id){
+      if(sb){
+        const {error} = await sb.from("shopping_blocks").delete().eq("id", id);
+        if(error){ showShoppingWarning(error); }
+        return;
+      }
+      const arr = JSON.parse(localStorage.getItem(LS_BLOCKS_KEY) || "[]").filter(r=>r.id!==id);
+      localStorage.setItem(LS_BLOCKS_KEY, JSON.stringify(arr));
+      const items = JSON.parse(localStorage.getItem(LS_ITEMS_KEY) || "[]").filter(r=>r.block_id!==id);
+      localStorage.setItem(LS_ITEMS_KEY, JSON.stringify(items));
+    },
+    async listItems(){
+      if(sb){
+        const {data,error} = await sb.from("shopping_items").select("*").order("created_at",{ascending:true});
+        if(error){ showShoppingWarning(error); return []; }
+        return data;
+      }
+      return JSON.parse(localStorage.getItem(LS_ITEMS_KEY) || "[]");
+    },
+    async addItem(it){
+      if(sb){
+        const {data,error} = await sb.from("shopping_items").insert(it).select();
+        if(error){ showShoppingWarning(error); return null; }
+        return data[0];
+      }
+      const arr = JSON.parse(localStorage.getItem(LS_ITEMS_KEY) || "[]");
+      const row = {id: crypto.randomUUID(), created_at:new Date().toISOString(), ...it};
+      arr.push(row); localStorage.setItem(LS_ITEMS_KEY, JSON.stringify(arr)); return row;
+    },
+    async removeItem(id){
+      if(sb){
+        const {error} = await sb.from("shopping_items").delete().eq("id", id);
+        if(error){ showShoppingWarning(error); }
+        return;
+      }
+      const arr = JSON.parse(localStorage.getItem(LS_ITEMS_KEY) || "[]").filter(r=>r.id!==id);
+      localStorage.setItem(LS_ITEMS_KEY, JSON.stringify(arr));
+    }
+  };
+
   /* ---------- Salden & Abrechnung relativ zu Tina ---------- */
   function computeBalances(expenses){
     const bal = {}; PEOPLE.forEach(p=>bal[p]=0);
@@ -350,6 +501,8 @@
   /* ---------- Rendering ---------- */
   const $ = (id)=>document.getElementById(id);
   let EXPENSES = [];
+  let BLOCKS = [];
+  let ITEMS = [];
 
   function ava(name){
     return `<span class="ava" style="background:${colorOf(name)}">${initials(name)}</span>`;
@@ -364,12 +517,22 @@
       el.innerHTML = `<div class="settle-empty">Alle sind mit Tina ausgeglichen 🌊</div>`;
       return;
     }
+    const settled = getSettled();
     el.innerHTML = withDebt.map(r=>{
+      const isSettled = settled.has(r.p);
+      const cls = isSettled ? "owe owe-settled" : "owe";
+      const check = `<label class="settledCheck"><input type="checkbox" class="settledInput" data-person="${escapeHtml(r.p)}" ${isSettled?"checked":""}/> beglichen</label>`;
       if(r.amt > 0){
-        return `<div class="owe">${ava(r.p)}<div class="txt"><b>${escapeHtml(r.p)}</b> <span class="arrow">schuldet</span> <b>${DEFAULT_PAYER}</b></div><div class="amt">${euro(r.amt)}</div><a class="paypalBtn" href="${paypalLink(r.amt)}" target="_blank" rel="noopener">💸 Zahlen</a></div>`;
+        return `<div class="${cls}">${ava(r.p)}<div class="txt"><b>${escapeHtml(r.p)}</b> <span class="arrow">schuldet</span> <b>${DEFAULT_PAYER}</b></div><div class="amt">${euro(r.amt)}</div>${check}<a class="paypalBtn" href="${paypalLink(r.amt)}" target="_blank" rel="noopener">💸 Zahlen</a></div>`;
       }
-      return `<div class="owe">${ava(DEFAULT_PAYER)}<div class="txt"><b>${DEFAULT_PAYER}</b> <span class="arrow">schuldet</span> <b>${escapeHtml(r.p)}</b></div><div class="amt">${euro(-r.amt)}</div></div>`;
+      return `<div class="${cls}">${ava(DEFAULT_PAYER)}<div class="txt"><b>${DEFAULT_PAYER}</b> <span class="arrow">schuldet</span> <b>${escapeHtml(r.p)}</b></div><div class="amt">${euro(-r.amt)}</div>${check}</div>`;
     }).join("");
+    el.querySelectorAll(".settledInput").forEach(inp=>{
+      inp.addEventListener("change", ()=>{
+        setSettled(inp.dataset.person, inp.checked);
+        inp.closest(".owe").classList.toggle("owe-settled", inp.checked);
+      });
+    });
   }
 
   function renderHead(){
@@ -440,6 +603,87 @@
     $("tbody").querySelectorAll(".del").forEach(b=>b.addEventListener("click", ()=>removeExpense(b.dataset.id)));
     $("tbody").querySelectorAll(".rowDayPrev").forEach(b=>b.addEventListener("click", ()=>stepRowDate(b.dataset.id, -1)));
     $("tbody").querySelectorAll(".rowDayNext").forEach(b=>b.addEventListener("click", ()=>stepRowDate(b.dataset.id, 1)));
+  }
+
+  function renderShopping(){
+    const wrap = $("blocksWrap");
+    if(BLOCKS.length===0){
+      wrap.innerHTML = `<div class="empty">Noch keine Blöcke — leg unten den ersten an 🛒</div>`;
+      return;
+    }
+    wrap.innerHTML = BLOCKS.map(b=>{
+      const items = ITEMS.filter(it=>it.block_id===b.id);
+      return `
+      <div class="block">
+        <div class="blockHead">
+          <h3>${escapeHtml(b.name)}</h3>
+          ${!b.is_fixed ? `<button class="del blockDel" data-block-id="${b.id}" title="Block löschen">🗑️</button>` : ''}
+        </div>
+        <ul class="itemList">
+          ${items.length===0
+            ? `<li class="itemEmpty">Noch nichts eingetragen</li>`
+            : items.map(it=>`<li><span>${escapeHtml(it.label)}</span><button class="del itemDel" data-item-id="${it.id}" title="Löschen">🗑️</button></li>`).join("")}
+        </ul>
+        <div class="addItemRow">
+          <input type="text" class="addItemInput" data-block-id="${b.id}" placeholder="Zutat hinzufügen…" />
+          <button class="addItemBtn" data-block-id="${b.id}" title="Hinzufügen">➕</button>
+        </div>
+      </div>`;
+    }).join("");
+    attachShoppingHandlers();
+  }
+
+  function attachShoppingHandlers(){
+    $("blocksWrap").querySelectorAll(".blockDel").forEach(b=>b.addEventListener("click", ()=>removeBlock(b.dataset.blockId)));
+    $("blocksWrap").querySelectorAll(".itemDel").forEach(b=>b.addEventListener("click", ()=>removeItem(b.dataset.itemId)));
+    $("blocksWrap").querySelectorAll(".addItemBtn").forEach(b=>b.addEventListener("click", ()=>addItemFromInput(b.dataset.blockId)));
+    $("blocksWrap").querySelectorAll(".addItemInput").forEach(inp=>{
+      inp.addEventListener("keydown", (e)=>{ if(e.key==="Enter"){ e.preventDefault(); addItemFromInput(inp.dataset.blockId); } });
+    });
+  }
+
+  async function addItemFromInput(blockId){
+    const input = $("blocksWrap").querySelector(`.addItemInput[data-block-id="${blockId}"]`);
+    const label = input.value.trim();
+    if(!label) return;
+    await shoppingStore.addItem({block_id: blockId, label});
+    await refreshShopping();
+  }
+
+  async function removeItem(id){
+    await shoppingStore.removeItem(id);
+    await refreshShopping();
+  }
+
+  async function removeBlock(id){
+    if(!confirm("Diesen Block inkl. aller Einträge wirklich löschen?")) return;
+    await shoppingStore.removeBlock(id);
+    await refreshShopping();
+  }
+
+  async function addBlockFromInput(){
+    const input = $("newBlockName");
+    const name = input.value.trim();
+    if(!name) return;
+    await shoppingStore.addBlock({name, is_fixed:false});
+    input.value = "";
+    await refreshShopping();
+  }
+
+  async function refreshShopping(){
+    BLOCKS = await shoppingStore.listBlocks();
+    ITEMS = await shoppingStore.listItems();
+    const active = document.activeElement;
+    const editingShopping = active && active.closest && active.closest("#blocksWrap");
+    if(!editingShopping) renderShopping();
+  }
+
+  async function seedFixedBlock(){
+    const blocks = await shoppingStore.listBlocks();
+    if(shoppingTableMissing) return;
+    if(!blocks.some(b=>b.name===FIXED_BLOCK_NAME)){
+      await shoppingStore.addBlock({name: FIXED_BLOCK_NAME, is_fixed:true});
+    }
   }
 
   function renderAll(){ renderSettle(); renderTable(); }
@@ -517,6 +761,10 @@
           $("statusText").textContent="live synchronisiert 🟢";
         }
       });
+    sb.channel("shopping-live")
+      .on("postgres_changes", {event:"*", schema:"public", table:"shopping_blocks"}, ()=>{ refreshShopping(); })
+      .on("postgres_changes", {event:"*", schema:"public", table:"shopping_items"}, ()=>{ refreshShopping(); })
+      .subscribe();
   }
 
   /* ---------- Seed: Unterkunft 856 € beim ersten Start ---------- */
@@ -530,6 +778,13 @@
     }
   }
 
+  /* ---------- Tabs ---------- */
+  function switchTab(tab){
+    document.querySelectorAll(".tabBtn").forEach(b=>b.classList.toggle("active", b.dataset.tab===tab));
+    $("tabExpenses").hidden = tab!=="expenses";
+    $("tabShopping").hidden = tab!=="shopping";
+  }
+
   /* ---------- Init ---------- */
   function init(){
     renderHead();
@@ -537,14 +792,19 @@
     if(usingSupabase && sb){ $("statusDot").className="dot on"; $("statusText").textContent="mit Supabase verbunden"; }
     else { $("statusDot").className="dot off"; $("statusText").textContent="lokal gespeichert (noch kein Supabase)"; }
 
-    $("syncBtn").addEventListener("click", ()=>refresh(true));
-    $("addRowBtn").addEventListener("click", addBlankRow);
+    document.querySelectorAll(".tabBtn").forEach(b=>b.addEventListener("click", ()=>switchTab(b.dataset.tab)));
 
-    document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) refresh(); });
-    window.addEventListener("focus", ()=>refresh());
+    $("syncBtn").addEventListener("click", ()=>{ refresh(true); refreshShopping(); });
+    $("addRowBtn").addEventListener("click", addBlankRow);
+    $("addBlockBtn").addEventListener("click", addBlockFromInput);
+    $("newBlockName").addEventListener("keydown", (e)=>{ if(e.key==="Enter"){ e.preventDefault(); addBlockFromInput(); } });
+
+    document.addEventListener("visibilitychange", ()=>{ if(!document.hidden){ refresh(); refreshShopping(); } });
+    window.addEventListener("focus", ()=>{ refresh(); refreshShopping(); });
 
     subscribeRealtime();
     seedIfEmpty().then(()=>refresh());
+    seedFixedBlock().then(()=>refreshShopping());
   }
   init();
   </script>
