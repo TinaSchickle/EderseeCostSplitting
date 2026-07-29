@@ -156,34 +156,32 @@
     .btn:hover{filter:brightness(1.03)}
     .btn.full{width:100%}
 
-    /* Ausgaben als gestapelte Karten */
-    .expenseList{display:flex;flex-direction:column;gap:14px}
-    .expenseCard{
-      background:linear-gradient(160deg,#fff,#fbfbf3);border:1px solid var(--line);border-radius:16px;
-      padding:14px;display:flex;flex-direction:column;gap:10px;
+    /* Ausgaben als transponierte Tabelle: Ausgaben = Spalten, Felder/Personen = Zeilen */
+    .tablewrap{overflow-x:auto;margin:0 -4px;padding-bottom:4px}
+    #expenseTable{width:100%;border-collapse:collapse;font-size:13px}
+    #expenseTable th,#expenseTable td{padding:8px;border-bottom:1px solid var(--line);vertical-align:middle;text-align:left}
+    #expenseTable td{min-width:130px}
+    #expenseTable td.num{text-align:right}
+    #expenseTable th{
+      position:sticky;left:0;background:var(--card);z-index:1;
+      font-size:11px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);font-weight:700;white-space:nowrap;
     }
-    .expenseCard.invalid{background:rgba(224,85,85,.08);border-color:rgba(224,85,85,.3)}
-    .expenseTop{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-    .expenseTop .descInput{flex:1 1 160px}
-    .expenseMeta{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end}
-    .expenseMeta label{display:flex;flex-direction:column;gap:4px;font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.03em}
-    .expenseMeta .amountInput{width:100px;text-align:right}
-    .expenseMeta .payerSelect{width:120px}
-    .expenseMeta .splitSelect{width:130px}
-    .invalidNote{color:var(--red);font-size:12px;font-weight:700;display:flex;align-items:center;gap:4px}
-    .shareGrid{
-      display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;
-      padding-top:10px;border-top:1px dashed var(--line);
-    }
-    .shareCell{display:flex;flex-direction:column;gap:3px;font-size:11px;color:var(--muted);font-weight:700}
-    .shareCell input{width:100%;text-align:right;padding:6px 7px;font-size:13px}
+    #expenseTable tr:last-child td, #expenseTable tr:last-child th{border-bottom:none}
+    #expenseTable td.col-invalid{background:rgba(224,85,85,.09)}
+    .warnRow td{border-top:none}
+    .invalidNote{color:var(--red);font-size:11px;font-weight:700}
     .del{
-      background:none;border:none;cursor:pointer;color:#c98b8b;font-size:16px;padding:4px 6px;border-radius:8px;flex:0 0 auto;
+      background:none;border:none;cursor:pointer;color:#c98b8b;font-size:16px;padding:4px 6px;border-radius:8px;
     }
     .del:hover{background:#fdeaea;color:var(--red)}
     .empty{color:var(--muted);text-align:center;padding:18px}
     footer{text-align:center;color:#5a6a69;font-size:12px;margin-top:24px}
     .note{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.5}
+
+    .descInput{width:150px}
+    .amountInput{width:90px;text-align:right}
+    .payerSelect{width:110px}
+    .splitSelect{width:120px}
 
     .datestep{display:flex;align-items:center;gap:3px}
     .datestep input{width:112px;text-align:center;padding:7px 4px}
@@ -250,14 +248,18 @@
       <!-- Tabelle -->
       <section class="card">
         <h2><span class="emoji">📋</span> Alle Ausgaben</h2>
-        <div class="expenseList" id="expenseList"></div>
+        <div class="tablewrap">
+          <table id="expenseTable">
+            <tbody id="expenseTbody"></tbody>
+          </table>
+        </div>
         <div class="addRowWrap">
           <button class="addRowBtn" id="addRowBtn">➕ Neue Ausgabe</button>
         </div>
         <div class="note">
           <b>Aufteilungstyp „Alle gleich":</b> Betrag wird automatisch auf alle 10 Personen verteilt.
           <b>„Individuell":</b> Betrag selbst pro Person eintragen — die Summe muss dem Betrag entsprechen,
-          sonst bleibt die Karte rot markiert.
+          sonst bleibt die Spalte rot markiert.
         </div>
       </section>
 
@@ -530,66 +532,95 @@
     });
   }
 
-  function rowHtml(e){
+  const FIELD_ROWS = [
+    {key:"date", label:"Datum"},
+    {key:"description", label:"Beschreibung"},
+    {key:"amount", label:"Betrag"},
+    {key:"paid_by", label:"Gezahlt von"},
+    {key:"split_type", label:"Aufteilungstyp"},
+  ];
+
+  function fieldCellHtml(e, field){
+    if(field==="date"){
+      return `<div class="datestep">
+        <button class="stepbtn rowDayPrev" data-id="${e.id}" title="Ein Tag zurück">‹</button>
+        <input type="date" data-id="${e.id}" data-field="date" value="${e.date}" />
+        <button class="stepbtn rowDayNext" data-id="${e.id}" title="Ein Tag vor">›</button>
+      </div>`;
+    }
+    if(field==="description"){
+      return `<input type="text" class="descInput" data-id="${e.id}" data-field="description" value="${escapeHtml(e.description||'')}" placeholder="Beschreibung" />`;
+    }
+    if(field==="amount"){
+      return `<input type="text" inputmode="decimal" class="amountInput" data-id="${e.id}" data-field="amount" value="${amountDisplay(e.amount)}" />`;
+    }
+    if(field==="paid_by"){
+      return `<select class="payerSelect" data-id="${e.id}" data-field="paid_by">
+        ${PEOPLE.map(p=>`<option value="${escapeHtml(p)}" ${p===e.paid_by?'selected':''}>${escapeHtml(p)}</option>`).join("")}
+      </select>`;
+    }
+    if(field==="split_type"){
+      const isEqual = e.split_type !== "individual";
+      return `<select class="splitSelect" data-id="${e.id}" data-field="split_type">
+        <option value="equal" ${isEqual?'selected':''}>Alle gleich</option>
+        <option value="individual" ${!isEqual?'selected':''}>Individuell</option>
+      </select>`;
+    }
+  }
+
+  function shareCellHtml(e, person){
     const isEqual = e.split_type !== "individual";
-    const invalid = !isRowValid(e);
     const shares = e.shares || {};
-    return `
-    <div class="expenseCard ${invalid?'invalid':''}">
-      <div class="expenseTop">
-        <div class="datestep">
-          <button class="stepbtn rowDayPrev" data-id="${e.id}" title="Ein Tag zurück">‹</button>
-          <input type="date" data-id="${e.id}" data-field="date" value="${e.date}" />
-          <button class="stepbtn rowDayNext" data-id="${e.id}" title="Ein Tag vor">›</button>
-        </div>
-        <input type="text" class="descInput" data-id="${e.id}" data-field="description" value="${escapeHtml(e.description||'')}" placeholder="Beschreibung" />
-        <button class="del" data-id="${e.id}" title="Löschen">🗑️</button>
-      </div>
-      <div class="expenseMeta">
-        <label>Betrag
-          <input type="text" inputmode="decimal" class="amountInput" data-id="${e.id}" data-field="amount" value="${amountDisplay(e.amount)}" />
-        </label>
-        <label>Gezahlt von
-          <select class="payerSelect" data-id="${e.id}" data-field="paid_by">
-            ${PEOPLE.map(p=>`<option value="${escapeHtml(p)}" ${p===e.paid_by?'selected':''}>${escapeHtml(p)}</option>`).join("")}
-          </select>
-        </label>
-        <label>Aufteilungstyp
-          <select class="splitSelect" data-id="${e.id}" data-field="split_type">
-            <option value="equal" ${isEqual?'selected':''}>Alle gleich</option>
-            <option value="individual" ${!isEqual?'selected':''}>Individuell</option>
-          </select>
-        </label>
-        ${invalid?`<div class="invalidNote">⚠️ Summe ${euro(sumShares(e))} ≠ Betrag ${euro(e.amount)}</div>`:''}
-      </div>
-      <div class="shareGrid">
-        ${PEOPLE.map(p=>`
-          <label class="shareCell">${escapeHtml(shortName(p))}
-            <input type="text" inputmode="decimal" data-id="${e.id}" data-field="share" data-person="${escapeHtml(p)}"
-              value="${amountDisplay(shares[p]||0)}" ${isEqual?'disabled':''} />
-          </label>
-        `).join("")}
-      </div>
-    </div>`;
+    return `<input type="text" inputmode="decimal" data-id="${e.id}" data-field="share" data-person="${escapeHtml(person)}"
+      value="${amountDisplay(shares[person]||0)}" ${isEqual?'disabled':''} />`;
   }
 
   function renderTable(){
-    const list = $("expenseList");
+    const tbody = $("expenseTbody");
     if(EXPENSES.length===0){
-      list.innerHTML = `<div class="empty">Noch keine Ausgaben — füg die erste über „➕ Neue Ausgabe" hinzu 🥾</div>`;
-    } else {
-      list.innerHTML = EXPENSES.map(rowHtml).join("");
+      tbody.innerHTML = `<tr><td class="empty" colspan="2">Noch keine Ausgaben — füg die erste über „➕ Neue Ausgabe" hinzu 🥾</td></tr>`;
+      return;
     }
+    const invalidOf = EXPENSES.map(e=>!isRowValid(e));
+    const colCls = (i)=>invalidOf[i]?"col-invalid":"";
+
+    const rows = [];
+
+    rows.push(`<tr>
+      <th></th>
+      ${EXPENSES.map((e,i)=>`<td class="${colCls(i)}"><button class="del" data-id="${e.id}" title="Löschen">🗑️</button></td>`).join("")}
+    </tr>`);
+
+    FIELD_ROWS.forEach(f=>{
+      rows.push(`<tr>
+        <th>${f.label}</th>
+        ${EXPENSES.map((e,i)=>`<td class="${colCls(i)} ${f.key==='amount'?'num':''}">${fieldCellHtml(e, f.key)}</td>`).join("")}
+      </tr>`);
+    });
+
+    PEOPLE.forEach(p=>{
+      rows.push(`<tr>
+        <th>${escapeHtml(shortName(p))}</th>
+        ${EXPENSES.map((e,i)=>`<td class="num ${colCls(i)}">${shareCellHtml(e, p)}</td>`).join("")}
+      </tr>`);
+    });
+
+    rows.push(`<tr class="warnRow">
+      <th></th>
+      ${EXPENSES.map((e,i)=>`<td class="${colCls(i)}">${invalidOf[i]?`<span class="invalidNote">⚠️ Summe ${euro(sumShares(e))} ≠ Betrag ${euro(e.amount)}</span>`:''}</td>`).join("")}
+    </tr>`);
+
+    tbody.innerHTML = rows.join("");
     attachRowHandlers();
   }
 
   function attachRowHandlers(){
-    $("expenseList").querySelectorAll("[data-field]").forEach(el=>{
+    $("expenseTbody").querySelectorAll("[data-field]").forEach(el=>{
       el.addEventListener("change", ()=>onFieldChange(el.dataset.id, el.dataset.field, el));
     });
-    $("expenseList").querySelectorAll(".del").forEach(b=>b.addEventListener("click", ()=>removeExpense(b.dataset.id)));
-    $("expenseList").querySelectorAll(".rowDayPrev").forEach(b=>b.addEventListener("click", ()=>stepRowDate(b.dataset.id, -1)));
-    $("expenseList").querySelectorAll(".rowDayNext").forEach(b=>b.addEventListener("click", ()=>stepRowDate(b.dataset.id, 1)));
+    $("expenseTbody").querySelectorAll(".del").forEach(b=>b.addEventListener("click", ()=>removeExpense(b.dataset.id)));
+    $("expenseTbody").querySelectorAll(".rowDayPrev").forEach(b=>b.addEventListener("click", ()=>stepRowDate(b.dataset.id, -1)));
+    $("expenseTbody").querySelectorAll(".rowDayNext").forEach(b=>b.addEventListener("click", ()=>stepRowDate(b.dataset.id, 1)));
   }
 
   function renderShopping(){
@@ -685,11 +716,15 @@
   function renderAll(){ renderSettle(); renderTable(); }
 
   /* ---------- Aktionen ---------- */
+  async function loadExpenses(){
+    EXPENSES = await store.list();
+  }
+
   async function refresh(showSpin=false){
     if(showSpin){ $("syncBtn").classList.add("busy"); }
-    EXPENSES = await store.list();
+    await loadExpenses();
     const active = document.activeElement;
-    const editingTable = active && active.closest && active.closest("#expenseList");
+    const editingTable = active && active.closest && active.closest("#expenseTbody");
     renderSettle();
     if(!editingTable) renderTable();
     if(showSpin){ setTimeout(()=>$("syncBtn").classList.remove("busy"), 350); }
@@ -737,13 +772,15 @@
     const amount = 0;
     const row = {date: todayISO(), description:"", amount, paid_by: DEFAULT_PAYER, split_type:"equal", shares: equalSplit(amount)};
     await store.add(row);
-    await refresh();
+    await loadExpenses();
+    renderAll();
   }
 
   async function removeExpense(id){
     if(!confirm("Diese Ausgabe wirklich löschen?")) return;
     await store.remove(id);
-    await refresh();
+    await loadExpenses();
+    renderAll();
   }
 
   /* ---------- Live-Sync (Supabase Realtime) ---------- */
