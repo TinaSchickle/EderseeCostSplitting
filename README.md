@@ -21,6 +21,9 @@ Trägt Ausgaben tabellarisch ein und rechnet automatisch aus, **wer wem was schu
 - **Live-Sync über Supabase** (Realtime): Änderungen erscheinen sofort auf allen
   Handys. Zusätzlich „🔄 Aktualisieren"-Button und Auto-Refresh beim Öffnen der App.
 - **Als App installierbar** (Home-Bildschirm / „Zum Startbildschirm hinzufügen").
+- **Zweiter Tab „🛒 Shoppingliste"**: Blöcke anlegen (z. B. „Ragout") und darunter
+  die dafür benötigten Zutaten eintragen. Block „Sonstiges" ist fest und lässt
+  sich nicht löschen, eigene Blöcke schon (inkl. aller Einträge).
 
 ## Personen
 Jacob, Andy, Ralf, Denis, Lisa, Natalia, Natalia +1, Thorsten, Tina, Abel
@@ -68,6 +71,33 @@ alter table public.expenses add column if not exists shares jsonb not null defau
 alter table public.expenses alter column description set default '';
 alter table public.expenses alter column amount set default 0;
 alter publication supabase_realtime add table public.expenses;
+```
+
+**Für die Shoppingliste** zusätzlich einmalig dieses SQL ausführen:
+
+```sql
+create table if not exists public.shopping_blocks (
+  id          uuid primary key default gen_random_uuid(),
+  created_at  timestamptz not null default now(),
+  name        text not null,
+  is_fixed    boolean not null default false
+);
+
+create table if not exists public.shopping_items (
+  id          uuid primary key default gen_random_uuid(),
+  created_at  timestamptz not null default now(),
+  block_id    uuid not null references public.shopping_blocks(id) on delete cascade,
+  label       text not null
+);
+
+alter table public.shopping_blocks enable row level security;
+alter table public.shopping_items enable row level security;
+
+create policy "shopping_blocks_all" on public.shopping_blocks for all using (true) with check (true);
+create policy "shopping_items_all" on public.shopping_items for all using (true) with check (true);
+
+alter publication supabase_realtime add table public.shopping_blocks;
+alter publication supabase_realtime add table public.shopping_items;
 ```
 
 > Hinweis: Der öffentliche Key steht im Browser sichtbar. Für diese private
