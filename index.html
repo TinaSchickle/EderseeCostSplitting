@@ -287,49 +287,11 @@
     </header>
 
     <nav class="tabs">
-      <button class="tabBtn" data-tab="expenses">💶 Kosten</button>
-      <button class="tabBtn" data-tab="shopping">🛒 Shoppingliste</button>
       <button class="tabBtn active" data-tab="overview">🗺️ Das Wichtigste im Überblick</button>
       <button class="tabBtn" data-tab="details">📖 Detailübersicht</button>
+      <button class="tabBtn" data-tab="expenses">💶 Kosten</button>
+      <button class="tabBtn" data-tab="shopping">🛒 Shoppingliste</button>
     </nav>
-
-    <div id="tabExpenses" class="tabPanel" data-tab="expenses" hidden>
-      <!-- Tabelle -->
-      <section class="card">
-        <h2><span class="emoji">📋</span> Alle Ausgaben</h2>
-        <div class="tablewrap">
-          <table id="expenseTable">
-            <tbody id="expenseTbody"></tbody>
-          </table>
-        </div>
-        <div class="addRowWrap">
-          <button class="addRowBtn" id="addRowBtn">➕ Neue Ausgabe</button>
-        </div>
-        <div class="note">
-          <b>Aufteilungstyp „Alle gleich":</b> Betrag wird automatisch auf alle 10 Personen verteilt.
-          <b>„Individuell":</b> Betrag selbst pro Person eintragen — die Summe muss dem Betrag entsprechen,
-          sonst bleibt die Spalte rot markiert.
-        </div>
-      </section>
-
-      <!-- Abrechnung -->
-      <section class="card">
-        <h2><span class="emoji">🤝</span> Wer schuldet Tina was?</h2>
-        <div class="settle" id="settle"></div>
-      </section>
-    </div>
-
-    <div id="tabShopping" class="tabPanel" data-tab="shopping" hidden>
-      <!-- Shoppingliste -->
-      <section class="card">
-        <h2><span class="emoji">🛒</span> Shoppingliste</h2>
-        <div class="blocksWrap" id="blocksWrap"></div>
-        <div class="addBlockWrap">
-          <input type="text" id="newBlockName" placeholder="Neuer Block, z. B. Ragout" />
-          <button class="btn" id="addBlockBtn">➕ Block</button>
-        </div>
-      </section>
-    </div>
 
     <div id="tabOverview" class="tabPanel" data-tab="overview">
       <!-- Das Wichtigste im Überblick -->
@@ -366,22 +328,15 @@
     <div id="tabDetails" class="tabPanel" data-tab="details" hidden>
       <!-- Detailübersicht -->
       <section class="card">
-        <h2><span class="emoji">📖</span> Wanderwochenende Edersee</h2>
-        <p class="planIntro">Ablaufplan: Freitag bis Sonntag | 10 Personen | 2 Autos</p>
-        <div class="quickFacts">
-          <div><b>Unterkunft:</b> Uferstraße, Waldeck-Niederwerbe</div>
-          <div><b>Logistik:</b> 2× PKW (Verteilung für Shuttle &amp; Endpunkte)</div>
-          <div><b>Gruppe:</b> 10 Personen</div>
-        </div>
-      </section>
-
-      <section class="card">
         <h2><span class="emoji">🏕️</span> Freitag: Ankunft &amp; Warm-up</h2>
 
         <div class="planBlock">
           <span class="planBadge aktivitaet">Aktivität</span>
           <div class="planTitle">Ankunft &amp; Basecamp einrichten</div>
           <p class="planText">Einchecken in der Unterkunft in der Uferstraße in Waldeck-Niederwerbe. Zimmerverteilung und kurzes Ankommen.</p>
+          <div class="linkRow">
+            <a class="linkBtn" href="https://www.airbnb.com/rooms/1278791934486691355?unique_share_id=6e0f0d90-e8cf-4456-8236-3fa106a6ff19&viralityEntryPoint=1&s=76" target="_blank" rel="noopener">🏡 Airbnb</a>
+          </div>
         </div>
 
         <div class="planBlock">
@@ -413,6 +368,13 @@
 
       <section class="card">
         <h2><span class="emoji">🥾</span> Samstag: Die Nordufer- &amp; Sperrmauer-Kombi</h2>
+        <div class="quickFacts">
+          <div><b>Start:</b> Nieder-Werbe (Unterkunft)</div>
+          <div><b>Ziel:</b> Waldeck</div>
+        </div>
+        <div class="linkRow" style="margin-bottom:16px">
+          <a class="linkBtn" href="https://www.komoot.com/tour/3158195558?ref=aso&share_token=aRQG5xecL2KI9ucYXDNfjyWv5xXdDa7C6P2UBtpEYaz4XO3MRe&t_s=referral&t_cid=route_share" target="_blank" rel="noopener">🥾 Route auf Komoot</a>
+        </div>
 
         <div class="planBlock">
           <span class="planBadge wanderung">Wanderung</span>
@@ -459,12 +421,17 @@
           <p class="planText">Am Ende des Tages geht es mit dem Bus von Waldeck zurück zur Unterkunft in Nieder-Werbe.</p>
           <p class="planText"><b>Fahrzeit:</b> Ca. 10 Minuten.</p>
           <p class="planText"><b>Ticket:</b> NVV App – 4er-Ticket 1,30&nbsp;€ pro Person, Einzelticket 2,60&nbsp;€ pro Person.</p>
-          <p class="planText">Kein Auto-Shuttle mehr nötig – die gesamte Gruppe fährt gemeinsam mit dem Bus zurück.</p>
         </div>
       </section>
 
       <section class="card">
         <h2><span class="emoji">🌲</span> Sonntag: Die Nationalpark-Urwald-Runde</h2>
+        <div class="quickFacts">
+          <div><b>Start &amp; Ziel:</b> Kirchweg Wanderparkplatz, Oberstraße 34, Edertal-Bringhausen</div>
+        </div>
+        <div class="linkRow" style="margin-bottom:16px">
+          <a class="linkBtn" href="https://www.komoot.com/smarttour/13063886?ref=atd&t_s=referral&t_cid=route_share" target="_blank" rel="noopener">🥾 Route auf Komoot</a>
+        </div>
 
         <div class="planBlock">
           <span class="planBadge logistik">Logistik</span>
@@ -503,6 +470,44 @@
           <p class="planText">Zurück am Parkplatz in Bringhausen stehen die Autos bereits abfahrbereit.</p>
           <p class="planText"><b>Abschluss:</b> Gemeinsames Abendessen / Snack / Getränk vor der Heimfahrt in der Umgebung.</p>
           <p class="planText"><b>Abreise:</b> Flexibler Fahrtantritt direkt vom Parkplatz aus.</p>
+        </div>
+      </section>
+    </div>
+
+    <div id="tabExpenses" class="tabPanel" data-tab="expenses" hidden>
+      <!-- Tabelle -->
+      <section class="card">
+        <h2><span class="emoji">📋</span> Alle Ausgaben</h2>
+        <div class="tablewrap">
+          <table id="expenseTable">
+            <tbody id="expenseTbody"></tbody>
+          </table>
+        </div>
+        <div class="addRowWrap">
+          <button class="addRowBtn" id="addRowBtn">➕ Neue Ausgabe</button>
+        </div>
+        <div class="note">
+          <b>Aufteilungstyp „Alle gleich":</b> Betrag wird automatisch auf alle 10 Personen verteilt.
+          <b>„Individuell":</b> Betrag selbst pro Person eintragen — die Summe muss dem Betrag entsprechen,
+          sonst bleibt die Spalte rot markiert.
+        </div>
+      </section>
+
+      <!-- Abrechnung -->
+      <section class="card">
+        <h2><span class="emoji">🤝</span> Wer schuldet Tina was?</h2>
+        <div class="settle" id="settle"></div>
+      </section>
+    </div>
+
+    <div id="tabShopping" class="tabPanel" data-tab="shopping" hidden>
+      <!-- Shoppingliste -->
+      <section class="card">
+        <h2><span class="emoji">🛒</span> Shoppingliste</h2>
+        <div class="blocksWrap" id="blocksWrap"></div>
+        <div class="addBlockWrap">
+          <input type="text" id="newBlockName" placeholder="Neuer Block, z. B. Ragout" />
+          <button class="btn" id="addBlockBtn">➕ Block</button>
         </div>
       </section>
     </div>
