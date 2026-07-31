@@ -59,11 +59,12 @@
     }
     header.hero p{margin:.2em 0;color:#4c5c5b;font-weight:500}
     .status{
-      display:inline-flex;align-items:center;gap:6px;
+      display:none;align-items:center;gap:6px;
       font-size:12px;color:var(--muted);
       background:rgba(255,255,255,.6);border:1px solid var(--line);
       padding:3px 10px;border-radius:999px;margin-top:6px;
     }
+    .status.warn{display:inline-flex}
     .dot{width:8px;height:8px;border-radius:50%}
     .dot.on{background:#22c55e}.dot.off{background:#f59e0b}
     .statusbar{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:6px}
@@ -245,6 +246,32 @@
     }
     .linkBtn:hover{filter:brightness(1.05)}
     .linkBtn:active{transform:scale(.96)}
+
+    /* Detailübersicht: Tagesplan */
+    .planIntro{font-size:13px;color:var(--muted);margin:0 0 4px;line-height:1.5}
+    .quickFacts{display:flex;flex-wrap:wrap;gap:6px 22px;margin:10px 0 2px;font-size:13.5px}
+    .quickFacts b{color:var(--ink)}
+    .dayIntro{font-size:12.5px;color:var(--muted);margin:0 0 14px}
+    .planBlock{border-left:3px solid var(--line);padding:2px 0 2px 14px;margin-bottom:18px}
+    .planBlock:last-child{margin-bottom:0}
+    .planBadge{
+      display:inline-block;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;
+      padding:3px 9px;border-radius:999px;margin-bottom:6px;
+    }
+    .planBadge.aktivitaet{background:#e6f7f4;color:var(--teal-d)}
+    .planBadge.option{background:#fff3d6;color:#a5760a}
+    .planBadge.gastro{background:#ffe8dc;color:var(--coral-d)}
+    .planBadge.abend{background:#fde3ec;color:#c2447a}
+    .planBadge.wanderung{background:#e3f2e6;color:var(--pine)}
+    .planBadge.transfer{background:#e7edf0;color:var(--mountain-d)}
+    .planBadge.logistik{background:#f0efe8;color:#786f5c}
+    .planTitle{font-weight:800;font-size:14.5px;margin:0 0 5px;color:var(--ink)}
+    .planText{font-size:13.5px;line-height:1.55;color:var(--ink);margin:0 0 6px}
+    .planText:last-child{margin-bottom:0}
+    .planText b{font-weight:700}
+    .planList{margin:2px 0 6px 18px;padding:0;font-size:13.5px;line-height:1.6}
+    .planList li{margin-bottom:2px}
+    .planSub{font-weight:800;font-size:12px;margin:10px 0 4px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
   </style>
 </head>
 <body>
@@ -260,13 +287,13 @@
     </header>
 
     <nav class="tabs">
-      <button class="tabBtn active" data-tab="expenses">💶 Kosten</button>
+      <button class="tabBtn" data-tab="expenses">💶 Kosten</button>
       <button class="tabBtn" data-tab="shopping">🛒 Shoppingliste</button>
-      <button class="tabBtn" data-tab="overview">🗺️ Das Wichtigste im Überblick</button>
+      <button class="tabBtn active" data-tab="overview">🗺️ Das Wichtigste im Überblick</button>
       <button class="tabBtn" data-tab="details">📖 Detailübersicht</button>
     </nav>
 
-    <div id="tabExpenses" class="tabPanel" data-tab="expenses">
+    <div id="tabExpenses" class="tabPanel" data-tab="expenses" hidden>
       <!-- Tabelle -->
       <section class="card">
         <h2><span class="emoji">📋</span> Alle Ausgaben</h2>
@@ -304,7 +331,7 @@
       </section>
     </div>
 
-    <div id="tabOverview" class="tabPanel" data-tab="overview" hidden>
+    <div id="tabOverview" class="tabPanel" data-tab="overview">
       <!-- Das Wichtigste im Überblick -->
       <section class="card">
         <h2><span class="emoji">🏠</span> Unterkunft</h2>
@@ -319,8 +346,7 @@
         <h2><span class="emoji">🥾</span> Samstag</h2>
         <ul class="infoList">
           <li><b>Start:</b> direkt von der Unterkunft losgelaufen</li>
-          <li><b>Auto parken:</b> Waldeck-Strandbad (TBD — evtl. einfach mit dem Bus zurück)</li>
-          <li><b>Ziel:</b> Waldeck</li>
+          <li><b>Ziel:</b> Waldeck (10 Min. Busfahrt zum Airbnb – Ticket über die NVV App)</li>
         </ul>
         <div class="linkRow">
           <a class="linkBtn" href="https://www.komoot.com/tour/3158195558?ref=aso&share_token=aRQG5xecL2KI9ucYXDNfjyWv5xXdDa7C6P2UBtpEYaz4XO3MRe&t_s=referral&t_cid=route_share" target="_blank" rel="noopener">🥾 Route auf Komoot</a>
@@ -340,8 +366,144 @@
     <div id="tabDetails" class="tabPanel" data-tab="details" hidden>
       <!-- Detailübersicht -->
       <section class="card">
-        <h2><span class="emoji">📖</span> Detailübersicht</h2>
-        <div class="empty">Kommt noch …</div>
+        <h2><span class="emoji">📖</span> Wanderwochenende Edersee</h2>
+        <p class="planIntro">Ablaufplan: Freitag bis Sonntag | 10 Personen | 2 Autos</p>
+        <div class="quickFacts">
+          <div><b>Unterkunft:</b> Uferstraße, Waldeck-Niederwerbe</div>
+          <div><b>Logistik:</b> 2× PKW (Verteilung für Shuttle &amp; Endpunkte)</div>
+          <div><b>Gruppe:</b> 10 Personen</div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2><span class="emoji">🏕️</span> Freitag: Ankunft &amp; Warm-up</h2>
+
+        <div class="planBlock">
+          <span class="planBadge aktivitaet">Aktivität</span>
+          <div class="planTitle">Ankunft &amp; Basecamp einrichten</div>
+          <p class="planText">Einchecken in der Unterkunft in der Uferstraße in Waldeck-Niederwerbe. Zimmerverteilung und kurzes Ankommen.</p>
+        </div>
+
+        <div class="planBlock">
+          <span class="planBadge option">Option</span>
+          <div class="planTitle">Optionaler Ausflug zu Schloss Waldeck</div>
+          <p class="planText"><b>Fahrt zum Schloss:</b> Ca. 10 Minuten Autofahrt von der Unterkunft nach Waldeck (Stadt).</p>
+          <p class="planText"><b>Parken:</b> Direkt am Schloss-Parkplatz. Kosten: ca. 5,00&nbsp;€ pro Auto.</p>
+          <div class="planSub">Aufstieg &amp; Bergbahn</div>
+          <p class="planText"><b>Zu Fuß ab Parkplatz:</b> Vom Schloss-Parkplatz sind es nur ca. 400–500 Meter Fußweg steil bergauf direkt in den Innenhof und zur Aussichtsterrasse (ca. 5–10 Minuten, kostenlos).</p>
+          <p class="planText"><b>Bergbahn:</b> Verbindet nur das Strandbad unten mit dem Schloss oben. Da ihr mit dem Auto direkt hoch fahrt, benötigt ihr die Bergbahn nicht.</p>
+        </div>
+
+        <div class="planBlock">
+          <span class="planBadge gastro">Gastro</span>
+          <div class="planTitle">Gemeinsames Abendessen</div>
+          <p class="planText">Zurück in der Ferienwohnung gibt es ein schnelles, budgetfreundliches und geselliges Abendessen.</p>
+        </div>
+
+        <div class="planBlock">
+          <span class="planBadge abend">Abendprogramm</span>
+          <div class="planTitle">Spontan: Absacker-Getränkerunde und/oder Spieleabend</div>
+          <p class="planText">Gemütlicher Ausklang des ersten Abends nach Lust und Laune:</p>
+          <ul class="planList">
+            <li><b>Auswärts:</b> Getränkerunde im Ortskern von Waldeck (z.&nbsp;B. Pizzeria Isola Sarda, Schlossstraße, freitags geöffnet bis 22:00 Uhr).</li>
+            <li><b>In der Unterkunft:</b> Entspannter Spieleabend mit der gesamten Truppe.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2><span class="emoji">🥾</span> Samstag: Die Nordufer- &amp; Sperrmauer-Kombi</h2>
+
+        <div class="planBlock">
+          <span class="planBadge wanderung">Wanderung</span>
+          <div class="planTitle">Etappe 1: Nieder-Werbe ➔ Halbinsel Scheid</div>
+          <p class="planText">Direkter Start von der Haustür in der Uferstraße auf den zertifizierten Urwaldsteig.</p>
+          <p class="planText"><b>Strecke &amp; Dauer:</b> Ca. 12 km | ca. 3,5 Stunden reine Gehzeit.</p>
+          <p class="planText"><b>Höhenmeter:</b> ca. 220 hm bergauf / 210 hm bergab. Hügelige Waldpfade mit tollem Seeblick.</p>
+        </div>
+
+        <div class="planBlock">
+          <span class="planBadge transfer">Transfer</span>
+          <div class="planTitle">Personenfähre: Scheid ➔ Rehbach</div>
+          <p class="planText">Verbindung vom Nord- zum Südufer über die Enge des Edersees.</p>
+          <p class="planText"><b>Taktung:</b> Die kleine Personenfähre pendelt samstags in der Saison fortlaufend nach Bedarf (ca. alle 10–15 Minuten).</p>
+          <p class="planText"><b>Dauer &amp; Kosten:</b> Ca. 10–15 Minuten Überfahrt | 3,50&nbsp;€ pro Person.</p>
+          <div class="planSub">Ausstieg &amp; Abkürzungen ab Scheid</div>
+          <p class="planText">Abbruch ab Scheid: Vom großen Schiffsanleger Scheid fährt das Fahrgastschiff direkt zurück nach Waldeck-Strandbad (Auto 1). Alternativ gibt es eine Busverbindung.</p>
+        </div>
+
+        <div class="planBlock">
+          <span class="planBadge wanderung">Wanderung</span>
+          <div class="planTitle">Etappe 2: Rehbach ➔ Sperrmauer Ost (Hemfurth)</div>
+          <p class="planText">Wanderung auf der Südseite über naturnahe Pfade vorbei am Wildpark Edersee bis zur Staumauer.</p>
+          <p class="planText"><b>Strecke &amp; Dauer:</b> Ca. 8 km | ca. 2,5 Stunden reine Gehzeit.</p>
+          <p class="planText"><b>Höhenmeter:</b> ca. 180 hm bergauf / 190 hm bergab.</p>
+        </div>
+
+        <div class="planBlock">
+          <span class="planBadge transfer">Transfer</span>
+          <div class="planTitle">Fahrgastschiff: Sperrmauer Ost ➔ Waldeck-Strandbad</div>
+          <p class="planText">Entspannter Abschluss des Wandertages auf dem großen Personenschiff.</p>
+          <p class="planText"><b>Taktung &amp; Dauer:</b> Samstags verlässlich im 1–2 Stunden-Takt. Fahrtzeit ca. 45 Minuten.</p>
+          <p class="planText"><b>Kosten:</b> ca. 10,00&nbsp;€ – 12,00&nbsp;€ pro Person.</p>
+          <div class="planSub">Alternativen ab Sperrmauer</div>
+          <ul class="planList">
+            <li><b>Weiterlaufen:</b> Ca. 4,5 km flach entlang des Nordufer-Radwegs (ER5) direkt zurück zum parkenden Auto am Strandbad laufen (ca. 1 Stunde, spart das Schiffsgeld).</li>
+            <li><b>Bus:</b> Die Buslinie 510 verkehrt an der Haltestelle Hemfurth Staumauer zurück nach Waldeck oder Nieder-Werbe.</li>
+          </ul>
+        </div>
+
+        <div class="planBlock">
+          <span class="planBadge logistik">Logistik</span>
+          <div class="planTitle">Rückfahrt: Waldeck ➔ Unterkunft Nieder-Werbe</div>
+          <p class="planText">Am Ende des Tages geht es mit dem Bus von Waldeck zurück zur Unterkunft in Nieder-Werbe.</p>
+          <p class="planText"><b>Fahrzeit:</b> Ca. 10 Minuten.</p>
+          <p class="planText"><b>Ticket:</b> NVV App – 4er-Ticket 1,30&nbsp;€ pro Person, Einzelticket 2,60&nbsp;€ pro Person.</p>
+          <p class="planText">Kein Auto-Shuttle mehr nötig – die gesamte Gruppe fährt gemeinsam mit dem Bus zurück.</p>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2><span class="emoji">🌲</span> Sonntag: Die Nationalpark-Urwald-Runde</h2>
+
+        <div class="planBlock">
+          <span class="planBadge logistik">Logistik</span>
+          <div class="planTitle">Anfahrt &amp; Startpunkt</div>
+          <p class="planText">Morgens auschecken, Taschen direkt in die Autos packen. Beide Autos fahren gemeinsam nach Bringhausen.</p>
+          <p class="planText"><b>Startpunkt:</b> Kirchweg Wanderparkplatz, Oberstraße 34, 34549 Edertal-Bringhausen</p>
+          <p class="planText">Kostenloser Wanderparkplatz direkt am Nationalpark-Eingang, keine Fähre nötig.</p>
+          <div class="linkRow">
+            <a class="linkBtn" href="https://maps.app.goo.gl/RJ9FJ9aJx8LRpjDv6?g_st=aw" target="_blank" rel="noopener">🗺️ Google Maps</a>
+          </div>
+        </div>
+
+        <div class="planBlock">
+          <span class="planBadge wanderung">Wanderung</span>
+          <div class="planTitle">Urwaldsteig-Runde ab Bringhausen</div>
+          <p class="planText"><b>Strecke &amp; Dauer:</b> Ca. 15 km | ca. 4,5 Stunden reine Gehzeit.</p>
+          <p class="planText"><b>Höhenmeter:</b> ca. 390 hm.</p>
+          <p class="planText">Route führt tief ins UNESCO-Weltnaturerbe des Nationalparks Kellerwald-Edersee – bewusster Kontrast zum wasser- und uferorientierten Samstag.</p>
+          <p class="planText">Nationalpark-Eintritt sowie der Wanderparkplatz Kirchweg sind kostenlos.</p>
+          <p class="planText">Start- und Endpunkt der Route liegen an unterschiedlichen Bushaltestellen – Endstation und Busverbindung zurück nach Bringhausen kurz vor der Tour prüfen.</p>
+          <div class="linkRow">
+            <a class="linkBtn" href="https://www.komoot.com/smarttour/13063886?ref=atd&t_s=referral&t_cid=route_share" target="_blank" rel="noopener">🥾 Route auf Komoot</a>
+          </div>
+        </div>
+
+        <div class="planBlock">
+          <span class="planBadge logistik">Logistik</span>
+          <div class="planTitle">Rückfahrt (optional)</div>
+          <p class="planText">Je nach Streckenführung besteht die Option, mit dem Bus zurück zum Parkplatz Kirchweg in Bringhausen zu fahren, statt den Weg zu Fuß zurückzulaufen.</p>
+          <p class="planText">Aktuelle Verbindung vorab über die NVV-Fahrplanauskunft (nvv.de) oder die App „NVV Mobil" prüfen.</p>
+        </div>
+
+        <div class="planBlock">
+          <span class="planBadge gastro">Gastro</span>
+          <div class="planTitle">Gemeinsamer Abschluss &amp; Abreise</div>
+          <p class="planText">Zurück am Parkplatz in Bringhausen stehen die Autos bereits abfahrbereit.</p>
+          <p class="planText"><b>Abschluss:</b> Gemeinsames Abendessen / Snack / Getränk vor der Heimfahrt in der Umgebung.</p>
+          <p class="planText"><b>Abreise:</b> Flexibler Fahrtantritt direkt vom Parkplatz aus.</p>
+        </div>
       </section>
     </div>
 
@@ -416,8 +578,14 @@
   let tableMissing = false;
   let shoppingTableMissing = false;
 
+  function revealStatusBar(){
+    const el = document.querySelector(".status");
+    if(el) el.classList.add("warn");
+  }
+
   function showStorageWarning(error){
     console.error(error);
+    revealStatusBar();
     const msg = (error && error.message) || "";
     if(error && error.code==="PGRST204" && /shares/.test(msg)){
       tableMissing = true;
@@ -477,6 +645,7 @@
   /* ---------- Shoppingliste: Storage ---------- */
   function showShoppingWarning(error){
     console.error(error);
+    revealStatusBar();
     const msg = (error && error.message) || "";
     shoppingTableMissing = true;
     if((error && error.code==="PGRST205") || /schema cache|does not exist/i.test(msg)){
