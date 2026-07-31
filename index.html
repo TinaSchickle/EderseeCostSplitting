@@ -230,6 +230,21 @@
     .addItemRow button:hover{background:var(--teal-d)}
     .addBlockWrap{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:6px}
     .addBlockWrap input{flex:1 1 200px}
+
+    /* Das Wichtigste im Überblick */
+    .infoText{margin:0 0 12px;line-height:1.55;color:var(--ink)}
+    .infoList{margin:0 0 12px;padding-left:20px;line-height:1.7}
+    .infoList li{margin-bottom:2px}
+    .linkRow{display:flex;gap:10px;flex-wrap:wrap}
+    .linkBtn{
+      appearance:none;text-decoration:none;cursor:pointer;font:inherit;font-weight:800;font-size:13px;
+      color:#fff;background:linear-gradient(160deg,var(--teal),var(--teal-d));
+      padding:9px 16px;border-radius:12px;white-space:nowrap;
+      display:inline-flex;align-items:center;gap:6px;box-shadow:0 6px 14px rgba(13,149,135,.25);
+      transition:transform .08s, filter .15s;
+    }
+    .linkBtn:hover{filter:brightness(1.05)}
+    .linkBtn:active{transform:scale(.96)}
   </style>
 </head>
 <body>
@@ -247,9 +262,11 @@
     <nav class="tabs">
       <button class="tabBtn active" data-tab="expenses">💶 Kosten</button>
       <button class="tabBtn" data-tab="shopping">🛒 Shoppingliste</button>
+      <button class="tabBtn" data-tab="overview">🗺️ Das Wichtigste im Überblick</button>
+      <button class="tabBtn" data-tab="details">📖 Detailübersicht</button>
     </nav>
 
-    <div id="tabExpenses" class="tabPanel">
+    <div id="tabExpenses" class="tabPanel" data-tab="expenses">
       <!-- Tabelle -->
       <section class="card">
         <h2><span class="emoji">📋</span> Alle Ausgaben</h2>
@@ -275,7 +292,7 @@
       </section>
     </div>
 
-    <div id="tabShopping" class="tabPanel" hidden>
+    <div id="tabShopping" class="tabPanel" data-tab="shopping" hidden>
       <!-- Shoppingliste -->
       <section class="card">
         <h2><span class="emoji">🛒</span> Shoppingliste</h2>
@@ -284,6 +301,47 @@
           <input type="text" id="newBlockName" placeholder="Neuer Block, z. B. Ragout" />
           <button class="btn" id="addBlockBtn">➕ Block</button>
         </div>
+      </section>
+    </div>
+
+    <div id="tabOverview" class="tabPanel" data-tab="overview" hidden>
+      <!-- Das Wichtigste im Überblick -->
+      <section class="card">
+        <h2><span class="emoji">🏠</span> Unterkunft</h2>
+        <p class="infoText">Uferstraße, Waldeck-Niederwerbe — das Haus ist ca. 200&nbsp;m vom Flairhotel entfernt.</p>
+        <div class="linkRow">
+          <a class="linkBtn" href="https://maps.app.goo.gl/FbQVFDAApZxEBNRf7?g_st=ac" target="_blank" rel="noopener">🗺️ Google Maps</a>
+          <a class="linkBtn" href="https://www.airbnb.com/rooms/1278791934486691355?unique_share_id=6e0f0d90-e8cf-4456-8236-3fa106a6ff19&viralityEntryPoint=1&s=76" target="_blank" rel="noopener">🏡 Airbnb</a>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2><span class="emoji">🥾</span> Samstag</h2>
+        <ul class="infoList">
+          <li><b>Start:</b> direkt von der Unterkunft losgelaufen</li>
+          <li><b>Auto parken:</b> Waldeck-Strandbad (TBD — evtl. einfach mit dem Bus zurück)</li>
+          <li><b>Ziel:</b> Waldeck</li>
+        </ul>
+        <div class="linkRow">
+          <a class="linkBtn" href="https://www.komoot.com/tour/3158195558?ref=aso&share_token=aRQG5xecL2KI9ucYXDNfjyWv5xXdDa7C6P2UBtpEYaz4XO3MRe&t_s=referral&t_cid=route_share" target="_blank" rel="noopener">🥾 Route auf Komoot</a>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2><span class="emoji">🥾</span> Sonntag</h2>
+        <p class="infoText">Start &amp; Ziel: Oberstraße 34, 34549 Edertal-Bringhausen — kostenloser Wanderparkplatz.</p>
+        <div class="linkRow">
+          <a class="linkBtn" href="https://maps.app.goo.gl/RJ9FJ9aJx8LRpjDv6?g_st=aw" target="_blank" rel="noopener">🗺️ Google Maps</a>
+          <a class="linkBtn" href="https://www.komoot.com/smarttour/13063886?ref=atd&t_s=referral&t_cid=route_share" target="_blank" rel="noopener">🥾 Route auf Komoot</a>
+        </div>
+      </section>
+    </div>
+
+    <div id="tabDetails" class="tabPanel" data-tab="details" hidden>
+      <!-- Detailübersicht -->
+      <section class="card">
+        <h2><span class="emoji">📖</span> Detailübersicht</h2>
+        <div class="empty">Kommt noch …</div>
       </section>
     </div>
 
@@ -842,8 +900,7 @@
   /* ---------- Tabs ---------- */
   function switchTab(tab){
     document.querySelectorAll(".tabBtn").forEach(b=>b.classList.toggle("active", b.dataset.tab===tab));
-    $("tabExpenses").hidden = tab!=="expenses";
-    $("tabShopping").hidden = tab!=="shopping";
+    document.querySelectorAll(".tabPanel").forEach(p=>{ p.hidden = p.dataset.tab !== tab; });
   }
 
   /* ---------- Init ---------- */
