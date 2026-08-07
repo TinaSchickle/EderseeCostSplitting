@@ -10,13 +10,13 @@ Trägt Ausgaben tabellarisch ein und rechnet automatisch aus, **wer wem was schu
   Datum, Beschreibung, Betrag, Gezahlt von, Aufteilungstyp, und eine Spalte pro Person
 - Datum lässt sich pro Zeile mit **‹ ›** tageweise ändern
 - Zwei Aufteilungstypen:
-  - **Alle gleich** – Betrag wird automatisch auf alle 10 Personen verteilt (Personen-Spalten gesperrt)
+  - **Alle gleich** – Betrag wird automatisch auf alle 9 Personen verteilt (Personen-Spalten gesperrt)
   - **Individuell** – Betrag pro Person selbst eintragen; die Summe muss dem Betrag
     entsprechen, sonst bleibt die Zeile rot markiert (⚠️)
 - Neue Zeile über den **➕ Neue Ausgabe**-Button unter der Tabelle
-- Unterkunft (856 €) ist vorbefüllt: Paare teilen sich ein Zimmer, Person 1 zahlt voll,
-  Person 2 nur 50 % (halber Anteil: **Lisa** mit Denis, **Natalia +1** mit Natalia) –
-  als „Individuell"-Zeile mit passend vorausgefüllten Beträgen
+- Unterkunft (856 €) ist vorbefüllt: Ein Zimmer-Paar teilt sich ein Zimmer, Person 1 zahlt
+  voll, Person 2 nur 50 % (halber Anteil: **Lisa** mit Denis) – als „Individuell"-Zeile
+  mit passend vorausgefüllten Beträgen
 - Abrechnung am Ende der Tabelle: **wer schuldet Tina was** (bzw. umgekehrt)
 - **Live-Sync über Supabase** (Realtime): Änderungen erscheinen sofort auf allen
   Handys. Zusätzlich „🔄 Aktualisieren"-Button und Auto-Refresh beim Öffnen der App.
@@ -26,7 +26,7 @@ Trägt Ausgaben tabellarisch ein und rechnet automatisch aus, **wer wem was schu
   sich nicht löschen, eigene Blöcke schon (inkl. aller Einträge).
 
 ## Personen
-Jacob, Andy, Ralf, Denis, Lisa, Natalia, Natalia +1, Thorsten, Tina, Abel
+Jacob, Andy, Ralf, Denis, Lisa, Kai, Thorsten, Tina, Abel
 
 ## Supabase
 Die App ist bereits mit dem (gemeinsamen) Supabase-Projekt verbunden – dieselbe

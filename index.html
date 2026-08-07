@@ -526,9 +526,9 @@
   const SUPABASE_URL = "https://wscuovmzdbhwugxsgfjw.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_eAz7id9uPfkRq0wTll_UFA_HaR9JMj1";
 
-  const PEOPLE = ["Jacob","Andy","Ralf","Denis","Lisa","Natalia","Natalia +1","Thorsten","Tina","Abel"];
+  const PEOPLE = ["Jacob","Andy","Ralf","Denis","Lisa","Kai","Thorsten","Tina","Abel"];
   // Wer im Zimmer-Paar nur den halben Unterkunfts-Anteil zahlt (nur für die Vorbefüllung der Unterkunft):
-  const HALF_SHARE = new Set(["Lisa","Natalia +1"]);
+  const HALF_SHARE = new Set(["Lisa"]);
   const DEFAULT_PAYER = "Tina";
   const PAYPAL_ME_USERNAME = "Tinasbirthday";
   const paypalLink = (amount)=>`https://paypal.me/${PAYPAL_ME_USERNAME}/${amount.toFixed(2)}EUR`;
@@ -536,8 +536,7 @@
   /* ---------- Farben pro Person (für Avatare) ---------- */
   const PALETTE = ["#ff8a5c","#12b3a0","#ff6b8a","#f6a83b","#5aa9e6","#9b6bd6","#3fc37a","#e0567f","#0d9587","#f5713f"];
   const colorOf = (name)=>PALETTE[PEOPLE.indexOf(name) % PALETTE.length] || "#12b3a0";
-  const initials = (name)=>name.replace("+1","").trim().slice(0,2).toUpperCase();
-  const shortName = (p)=>p==="Natalia +1" ? "Nat.+1" : p;
+  const initials = (name)=>name.trim().slice(0,2).toUpperCase();
 
   /* ---------- Helpers ---------- */
   const euro = (n)=>Number(n||0).toLocaleString("de-DE",{style:"currency",currency:"EUR"});
@@ -556,6 +555,17 @@
     const remainder = cents - base*n;
     const shares = {};
     PEOPLE.forEach((p,i)=>{ shares[p] = round2((base + (i<remainder?1:0))/100); });
+    return shares;
+  }
+  // Verteilt einen Betrag nach Gewicht (z. B. Zimmer-Paare: 1 = voller Anteil, 0.5 = halber Anteil)
+  function weightedSplit(amount, weightOf){
+    const cents = Math.round((Number(amount)||0)*100);
+    const weights = PEOPLE.map(weightOf);
+    const totalWeight = weights.reduce((a,b)=>a+b,0);
+    const bases = weights.map(w=>Math.floor(cents*w/totalWeight));
+    const remainder = cents - bases.reduce((a,b)=>a+b,0);
+    const shares = {};
+    PEOPLE.forEach((p,i)=>{ shares[p] = round2((bases[i] + (i<remainder?1:0))/100); });
     return shares;
   }
   function sumShares(e){ return Object.values(e.shares||{}).reduce((s,v)=>s+(Number(v)||0),0); }
@@ -853,7 +863,7 @@
 
     PEOPLE.forEach(p=>{
       rows.push(`<tr>
-        <th>${escapeHtml(shortName(p))}</th>
+        <th>${escapeHtml(p)}</th>
         ${EXPENSES.map((e,i)=>`<td class="${colCls(i)}">${shareCellHtml(e, p, editingOf[i])}</td>`).join("")}
       </tr>`);
     });
@@ -1065,8 +1075,7 @@
     const cur = await store.list();
     if(tableMissing) return;
     if(cur.length===0){
-      const shares = {};
-      PEOPLE.forEach(p=>{ shares[p] = HALF_SHARE.has(p) ? 47.56 : 95.11; });
+      const shares = weightedSplit(856, p => HALF_SHARE.has(p) ? 0.5 : 1);
       await store.add({date: todayISO(), description:"Unterkunft", amount:856, paid_by:DEFAULT_PAYER, split_type:"individual", shares});
     }
   }
